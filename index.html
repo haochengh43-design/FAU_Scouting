@@ -715,8 +715,8 @@ const RADAR=[
    {w:.40, l:'OREB/REB', t:'p',  f:a=>SRC.orb?ratio(a.orb,a.reb):null, z:a=>a.reb===0}]},
  /* fouls count against the player, so this one is ranked upside down */
  {l:'Defense', c:[
-   {w:.40, l:'STL/40', t:'40', f:a=>rate40(a,'stl')},
-   {w:.50, l:'BLK/40', t:'40', f:a=>rate40(a,'blk')},
+   {w:.50, l:'STL/40', t:'40', f:a=>rate40(a,'stl')},
+   {w:.40, l:'BLK/40', t:'40', f:a=>rate40(a,'blk')},
    {w:.10, l:'PF/40',  t:'40', f:a=>rate40(a,'pf'), inv:true}]},
 ];
 const colLabel=(c,pr)=>(c.a||c.f)?c.l:c.l+(pr==='40'?'/40':'/G');
