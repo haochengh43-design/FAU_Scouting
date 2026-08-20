@@ -1,0 +1,2409 @@
+<meta charset="utf-8">
+<title>FAU Scouting</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap');
+
+:root{
+  --blue:#003366; --blue-deep:#001E3D; --blue-lift:#0B4C90;
+  --red:#CC0000;
+  --paper:#EEF1F5; --card:#FFFFFF;
+  --ink:#101822; --slate:#64738A; --slate-light:#93A0B2; --line:#DCE3EC;
+  --sidebar-w:236px;
+  --display:'Barlow Condensed',Arial Narrow,sans-serif;
+  --body:'IBM Plex Sans',system-ui,sans-serif;
+  --data:'IBM Plex Mono',ui-monospace,monospace;
+}
+*{box-sizing:border-box;}
+/* Author display rules (.modebar{display:flex} etc.) outrank the UA sheet's
+   [hidden]{display:none}, so the attribute silently does nothing. Force it. */
+[hidden]{display:none !important;}
+
+.fau-app{font-family:var(--body);color:var(--ink);background:var(--paper);
+  display:grid;grid-template-columns:var(--sidebar-w) 1fr;min-height:840px;
+  border:1px solid var(--line);overflow:hidden;}
+
+/* ── sidebar ───────────────────────────── */
+.side{background:var(--blue);display:flex;flex-direction:column;padding:22px 0 16px;position:relative;}
+.side::after{content:'';position:absolute;top:0;right:0;bottom:0;width:3px;
+  background:linear-gradient(180deg,var(--red) 0%,var(--red) 34%,rgba(255,255,255,.12) 34%);}
+.logo-slot{margin:0 18px 4px;height:82px;border:1px dashed rgba(255,255,255,.28);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;}
+.logo-mark{font-family:var(--display);font-weight:700;font-size:38px;line-height:1;letter-spacing:.06em;color:#fff;}
+.logo-hint{font-family:var(--display);font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:rgba(255,255,255,.42);}
+.side-label{font-family:var(--display);font-size:11px;letter-spacing:.22em;text-transform:uppercase;
+  color:rgba(255,255,255,.45);padding:26px 20px 10px;}
+.nav{display:flex;flex-direction:column;}
+.nav-item{display:flex;align-items:center;gap:11px;padding:13px 20px;border:0;background:none;width:100%;
+  text-align:left;font-family:var(--display);font-size:19px;font-weight:600;letter-spacing:.09em;
+  text-transform:uppercase;color:rgba(255,255,255,.7);cursor:pointer;border-left:3px solid transparent;
+  transition:background .14s ease,color .14s ease;}
+.nav-item svg{width:17px;height:17px;flex:none;stroke-width:1.6;}
+.nav-item:hover{background:rgba(255,255,255,.07);color:#fff;}
+.nav-item[aria-current="true"]{background:var(--blue-deep);color:#fff;border-left-color:var(--red);}
+.nav-item:focus-visible{outline:2px solid #fff;outline-offset:-3px;}
+.side-foot{margin-top:auto;padding:16px 20px 0;border-top:1px solid rgba(255,255,255,.14);
+  font-family:var(--data);font-size:10.5px;line-height:1.8;color:rgba(255,255,255,.5);}
+.side-foot b{color:#fff;font-weight:500;}
+
+/* ── main ──────────────────────────────── */
+.main{display:flex;flex-direction:column;min-width:0;background:var(--paper);}
+.topbar{background:var(--card);border-bottom:1px solid var(--line);padding:18px 26px 0;}
+
+.crumbrow{display:flex;align-items:center;gap:10px;min-height:20px;}
+.back{border:1px solid var(--line);background:var(--card);cursor:pointer;width:24px;height:24px;
+  display:flex;align-items:center;justify-content:center;border-radius:2px;color:var(--blue);flex:none;}
+.back svg{width:13px;height:13px;stroke:currentColor;stroke-width:2;fill:none;}
+.back:hover{background:var(--blue);color:#fff;border-color:var(--blue);}
+.back:focus-visible{outline:2px solid var(--blue-lift);outline-offset:1px;}
+.crumb{font-family:var(--display);font-size:11px;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--slate-light);display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.crumb button{border:0;background:none;padding:0;font:inherit;letter-spacing:inherit;
+  color:var(--blue-lift);cursor:pointer;text-transform:inherit;}
+.crumb button:hover{color:var(--red);text-decoration:underline;}
+.crumb button:focus-visible{outline:2px solid var(--blue-lift);outline-offset:2px;}
+.crumb i{font-style:normal;color:var(--line);}
+.crumb em{font-style:normal;color:var(--slate);}
+
+.title-row{display:flex;align-items:flex-end;gap:14px;flex-wrap:wrap;margin-top:4px;}
+.title{font-family:var(--display);font-size:38px;font-weight:700;line-height:1;letter-spacing:.02em;
+  text-transform:uppercase;margin:0;max-width:640px;}
+.title-note{font-family:var(--data);font-size:12px;color:var(--slate);padding-bottom:4px;}
+.scope{font-family:var(--display);font-size:10px;letter-spacing:.16em;text-transform:uppercase;
+  border:1px solid var(--blue);color:var(--blue);padding:3px 7px;border-radius:2px;margin-bottom:4px;}
+.search{margin-left:auto;position:relative;padding-bottom:2px;}
+.search input{font-family:var(--body);font-size:13px;color:var(--ink);width:262px;padding:9px 12px 9px 32px;
+  border:1px solid var(--line);background:var(--paper);border-radius:2px;}
+.search input::placeholder{color:var(--slate-light);}
+.search input:focus{outline:2px solid var(--blue-lift);outline-offset:1px;border-color:transparent;}
+.search svg{position:absolute;left:10px;top:10px;width:14px;height:14px;stroke:var(--slate-light);stroke-width:1.8;fill:none;}
+
+.modebar{display:flex;align-items:center;gap:12px;margin-top:16px;}
+.seg{display:inline-flex;border:1px solid var(--blue);border-radius:2px;overflow:hidden;}
+.seg button{font-family:var(--display);font-size:15px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;
+  padding:8px 22px;border:0;background:var(--card);color:var(--blue);cursor:pointer;transition:background .13s,color .13s;}
+.seg button+button{border-left:1px solid var(--blue);}
+.seg button:hover{background:#E7EEF7;}
+.seg button[aria-pressed="true"]{background:var(--blue);color:#fff;}
+.seg button:focus-visible{outline:2px solid var(--red);outline-offset:-3px;}
+.mode-hint{font-family:var(--data);font-size:11px;color:var(--slate-light);}
+
+.filters{display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding:14px 0;min-height:14px;}
+.fgroup{display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
+.fgroup-label{font-family:var(--display);font-size:11px;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--slate-light);margin-right:2px;}
+.chip{font-family:var(--data);font-size:11.5px;font-weight:500;padding:5px 10px;border:1px solid var(--line);
+  background:var(--card);color:var(--slate);cursor:pointer;border-radius:2px;transition:border-color .12s,color .12s;}
+.chip:hover{border-color:var(--blue-lift);color:var(--blue);}
+.chip[aria-pressed="true"]{background:var(--blue);border-color:var(--blue);color:#fff;}
+.chip:focus-visible{outline:2px solid var(--blue-lift);outline-offset:1px;}
+.fdivider{width:1px;height:20px;background:var(--line);margin:0 4px;}
+.sortwrap{margin-left:auto;display:flex;align-items:center;gap:6px;}
+.sortwrap select{font-family:var(--data);font-size:11.5px;color:var(--ink);padding:5px 8px;
+  border:1px solid var(--line);background:var(--card);border-radius:2px;cursor:pointer;}
+.sortwrap select:focus-visible{outline:2px solid var(--blue-lift);outline-offset:1px;}
+.provisional{font-family:var(--display);font-size:10px;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--red);border:1px solid var(--red);padding:2px 5px;border-radius:2px;}
+
+/* ── tables ────────────────────────────── */
+.tablewrap{flex:1;overflow:auto;padding:18px 26px 26px;}
+table{width:100%;border-collapse:collapse;background:var(--card);border:1px solid var(--line);}
+thead th{font-family:var(--display);font-size:12.5px;font-weight:600;letter-spacing:.15em;text-transform:uppercase;
+  color:var(--slate);text-align:left;padding:11px 10px;border-bottom:2px solid var(--blue);
+  white-space:nowrap;position:sticky;top:0;background:var(--card);z-index:2;}
+thead th.num{text-align:right;}
+tbody td{padding:12px 10px;border-bottom:1px solid var(--line);font-size:14.5px;vertical-align:middle;white-space:nowrap;}
+tbody td.num{font-family:var(--data);font-size:14.5px;text-align:right;font-variant-numeric:tabular-nums;}
+tbody tr:last-child td{border-bottom:0;}
+tbody tr.prow:hover,tbody tr.erow:hover{background:#F7F9FC;}
+tr.erow{cursor:pointer;}
+tr.erow:focus-visible{outline:2px solid var(--blue-lift);outline-offset:-2px;}
+tr.month td{background:var(--paper);padding:8px 10px;font-family:var(--display);font-size:12.5px;font-weight:600;
+  letter-spacing:.22em;text-transform:uppercase;color:var(--blue);border-bottom:1px solid var(--line);}
+
+.plink{border:0;background:none;padding:0;font:inherit;font-weight:600;font-size:13.5px;color:var(--ink);
+  cursor:pointer;text-align:left;border-bottom:1px solid transparent;}
+.plink:hover{color:var(--blue-lift);border-bottom-color:var(--blue-lift);}
+.plink:focus-visible{outline:2px solid var(--blue-lift);outline-offset:2px;}
+.ename{font-weight:600;font-size:15px;}
+.esub,.psub{font-size:11.5px;color:var(--slate);margin-top:1px;}
+.mono{font-family:var(--data);font-size:14px;}
+.pos{font-family:var(--display);font-size:14.5px;font-weight:600;letter-spacing:.1em;color:var(--blue);}
+.new-n{font-family:var(--data);font-size:12.5px;font-weight:600;color:var(--blue);}
+
+.star{border:0;background:none;cursor:pointer;padding:2px;line-height:0;color:var(--slate-light);
+  transition:color .12s,transform .12s;}
+.star svg{width:16px;height:16px;stroke-width:1.6;fill:none;}
+.star:hover{color:var(--red);transform:scale(1.12);}
+.star[aria-pressed="true"]{color:var(--red);}
+.star[aria-pressed="true"] svg{fill:var(--red);}
+.star:focus-visible{outline:2px solid var(--blue-lift);outline-offset:2px;}
+
+.ident{display:flex;align-items:center;gap:8px;position:relative;cursor:default;}
+.ticks{display:flex;gap:1.5px;align-items:flex-end;height:15px;}
+.ticks i{width:2.5px;height:100%;background:var(--blue);opacity:.62;display:block;}
+.ticks i.flag{background:var(--red);opacity:1;}
+.ticks i.ghost{background:var(--slate-light);opacity:.3;}
+.ident-tag{font-family:var(--display);font-size:11px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;}
+.ident-tag.clean{color:var(--slate);}
+.ident-tag.veto{color:var(--blue-lift);}
+.ident-tag.review{color:var(--red);}
+.ident-n{font-family:var(--data);font-size:11px;color:var(--slate-light);}
+.tip{position:absolute;bottom:calc(100% + 8px);right:0;width:246px;background:var(--blue-deep);color:#fff;
+  padding:10px 12px;font-size:11.5px;line-height:1.55;border-radius:2px;opacity:0;visibility:hidden;
+  transition:opacity .13s;z-index:5;pointer-events:none;box-shadow:0 6px 20px rgba(0,20,50,.28);}
+.tip b{display:block;font-family:var(--display);font-size:11px;letter-spacing:.16em;text-transform:uppercase;
+  color:#8FB6E4;margin-bottom:4px;font-weight:600;}
+.ident:hover .tip,.ident:focus-within .tip{opacity:1;visibility:visible;}
+.flagcell{font-family:var(--display);font-size:11px;font-weight:600;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--red);}
+
+/* event summary strip */
+.evbar{display:flex;gap:0;background:var(--card);border:1px solid var(--line);margin-bottom:18px;flex-wrap:wrap;}
+.evbar div{padding:14px 20px;border-right:1px solid var(--line);min-width:126px;}
+.evbar div:last-child{border-right:0;}
+.evbar dt{font-family:var(--display);font-size:11.5px;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--slate-light);margin:0 0 3px;}
+.evbar dd{margin:0;font-family:var(--data);font-size:16.5px;font-weight:500;color:var(--ink);}
+
+/* player detail placeholder */
+.pdhead{background:var(--card);border:1px solid var(--line);padding:20px 22px;display:flex;
+  gap:26px;flex-wrap:wrap;margin-bottom:18px;}
+.pdhead div{min-width:96px;}
+.pdhead dt{font-family:var(--display);font-size:10px;letter-spacing:.18em;text-transform:uppercase;
+  color:var(--slate-light);margin:0 0 3px;}
+.pdhead dd{margin:0;font-family:var(--data);font-size:14px;color:var(--ink);}
+.pdstub{border:1px dashed var(--slate-light);background:var(--card);padding:70px 30px;text-align:center;}
+.pdstub h3{font-family:var(--display);font-size:22px;font-weight:600;letter-spacing:.08em;
+  text-transform:uppercase;margin:0 0 8px;color:var(--blue);}
+.pdstub p{font-size:13px;color:var(--slate);margin:0 auto;max-width:420px;line-height:1.6;}
+
+
+.awaytag{font-family:var(--display);font-size:9.5px;font-weight:600;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--slate);border:1px solid var(--line);
+  padding:1px 4px;border-radius:2px;margin-left:5px;vertical-align:1px;}
+
+/* ── player detail ─────────────────────── */
+.pd-head{background:var(--card);border:1px solid var(--line);padding:18px 22px;margin-bottom:18px;
+  display:flex;gap:26px;align-items:flex-start;flex-wrap:wrap;}
+.pd-bio{display:flex;gap:30px;flex-wrap:wrap;margin:0;flex:1;min-width:260px;}
+.pd-bio div{min-width:118px;}
+.pd-bio dt,.rk dt{font-family:var(--display);font-size:11.5px;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--slate-light);margin:0 0 3px;}
+.pd-bio dd{margin:0;font-family:var(--data);font-size:16px;color:var(--ink);}
+.pd-sub{display:block;font-family:var(--body);font-size:12px;color:var(--slate-light);margin-top:2px;
+  letter-spacing:0;max-width:190px;}
+.blank{color:var(--slate-light);}
+.pd-side{display:flex;align-items:center;gap:14px;}
+.rkgroup{display:flex;gap:16px;}
+.rk dd{margin:0;font-family:var(--data);font-size:16.5px;font-weight:600;color:var(--blue);}
+.rk .nr,.rk .out{color:var(--slate-light);font-weight:400;font-size:13px;}
+.rk .out{cursor:help;}
+.rk-none{font-family:var(--data);font-size:13px;color:var(--slate-light);}
+.ig{width:32px;height:32px;border:1px solid var(--line);border-radius:2px;display:flex;
+  align-items:center;justify-content:center;color:var(--slate);flex:none;}
+.ig svg{width:17px;height:17px;}
+.ig:hover{background:var(--blue);border-color:var(--blue);color:#fff;}
+.ig:focus-visible{outline:2px solid var(--blue-lift);outline-offset:2px;}
+.pd-warn{flex-basis:100%;display:flex;gap:9px;align-items:flex-start;margin-top:4px;
+  border-left:3px solid var(--red);background:#FDF3F3;padding:9px 12px;font-size:12px;color:#7A1A1A;}
+.pd-warn span{font-family:var(--display);font-weight:700;color:#fff;background:var(--red);
+  width:17px;height:17px;border-radius:50%;text-align:center;line-height:17px;font-size:12px;flex:none;}
+
+.pd-block{background:var(--card);border:1px solid var(--line);margin-bottom:18px;}
+.pd-bar{display:flex;align-items:center;gap:12px;padding:13px 18px;border-bottom:1px solid var(--line);flex-wrap:wrap;}
+.pd-bar h3{font-family:var(--display);font-size:18.5px;font-weight:600;letter-spacing:.12em;
+  text-transform:uppercase;margin:0;color:var(--blue);}
+.seg2{display:inline-flex;border:1px solid var(--line);border-radius:2px;overflow:hidden;margin-left:auto;}
+.seg2 button{font-family:var(--data);font-size:11.5px;padding:5px 12px;border:0;background:var(--card);
+  color:var(--slate);cursor:pointer;}
+.seg2 button+button{border-left:1px solid var(--line);}
+.seg2 button:hover{background:#EEF3F9;color:var(--blue);}
+.seg2 button[aria-pressed="true"]{background:var(--blue);color:#fff;}
+.seg2 button:focus-visible{outline:2px solid var(--red);outline-offset:-3px;}
+.pd-foot{margin:0;padding:11px 18px 15px;font-size:13px;color:var(--slate-light);line-height:1.6;}
+
+.pd-table{border:0;}
+.pd-table thead th{border-bottom:1px solid var(--line);}
+.pd-table td{border-bottom:1px solid var(--line);}
+tr.srow{cursor:pointer;}
+tr.srow:hover{background:#F7F9FC;}
+tr.srow.open{background:#F2F6FB;}
+tr.srow:focus-visible{outline:2px solid var(--blue-lift);outline-offset:-2px;}
+.stog{width:24px;color:var(--blue);font-size:11px;}
+.syr{font-family:var(--display);font-size:17px;font-weight:600;letter-spacing:.06em;color:var(--ink);}
+tr.erow-sub td{background:#FAFBFD;font-size:13.5px;color:var(--slate);}
+.esubname{font-family:var(--body);font-size:12.5px;color:var(--ink);padding-left:6px;}
+
+.sparkgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:0;}
+.sparkbox{margin:0;padding:14px 10px 8px;border-right:1px solid var(--line);border-bottom:1px solid var(--line);}
+.sparkbox:nth-child(3n){border-right:0;}
+.sparkbox:nth-child(n+4){border-bottom:0;}
+.sparkbox figcaption{font-family:var(--display);font-size:12.5px;font-weight:600;letter-spacing:.16em;
+  text-transform:uppercase;color:var(--slate);text-align:center;margin-bottom:2px;}
+.spark{width:100%;height:auto;display:block;}
+.spark .axis{stroke:var(--line);stroke-width:1;}
+.spark .pline{fill:none;stroke:var(--blue);stroke-width:2;}
+.spark .pdot{fill:var(--blue);}
+.spark .peerline{fill:none;stroke:var(--red);stroke-width:1.5;stroke-dasharray:4 3;opacity:.8;}
+.spark .atick{font-family:var(--data);font-size:9.5px;fill:var(--slate-light);text-anchor:end;}
+.spark .xtick{font-family:var(--data);font-size:10px;fill:var(--slate);text-anchor:middle;}
+.nochart{font-family:var(--data);font-size:11px;color:var(--slate-light);text-align:center;padding:34px 0;}
+.pd-legend{display:flex;align-items:center;gap:6px;font-family:var(--data);font-size:12.5px;color:var(--slate);}
+.pd-legend span{width:14px;height:0;border-top:2px solid var(--blue);display:inline-block;}
+.pd-legend .k-x{border-top:2px dashed var(--red);margin-left:10px;}
+
+.radarwrap{display:flex;gap:26px;align-items:flex-start;padding:16px 18px;flex-wrap:wrap;}
+.radar{width:262px;height:auto;flex:none;}
+.radar .rring{fill:none;stroke:var(--line);stroke-width:1;}
+.radar .rspoke{stroke:var(--line);stroke-width:1;}
+.radar .rfill{fill:rgba(0,51,102,.16);stroke:var(--blue);stroke-width:2;}
+.radar .rdot{fill:var(--blue);}
+.radar .rlab{font-family:var(--display);font-size:10.5px;font-weight:600;letter-spacing:.12em;
+  text-transform:uppercase;fill:var(--slate);}
+.radar .rval{font-family:var(--data);font-size:12px;font-weight:600;fill:var(--blue);}
+.radarnote{flex:1;min-width:250px;font-size:14px;color:var(--slate);line-height:1.6;}
+.radarnote p{margin:0 0 6px;}
+.radarnote b{color:var(--ink);}
+
+@media (max-width:820px){
+  .sparkgrid{grid-template-columns:repeat(2,1fr);}
+  .sparkbox:nth-child(3n){border-right:1px solid var(--line);}
+  .sparkbox:nth-child(2n){border-right:0;}
+  .sparkbox:nth-child(n+4){border-bottom:1px solid var(--line);}
+  .sparkbox:nth-child(n+5){border-bottom:0;}
+  .seg2{margin-left:0;}
+}
+
+.empty{background:var(--card);border:1px solid var(--line);padding:64px 30px;text-align:center;}
+.empty h3{font-family:var(--display);font-size:24px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;margin:0 0 8px;}
+.empty p{font-size:13px;color:var(--slate);margin:0;}
+
+@media (max-width:900px){
+  .fau-app{grid-template-columns:1fr;}
+  .side{flex-direction:row;align-items:center;padding:12px 14px;gap:14px;overflow-x:auto;}
+  .side::after{top:auto;height:3px;width:100%;background:var(--red);}
+  .logo-slot{height:46px;width:64px;margin:0;flex:none;}
+  .logo-mark{font-size:22px;}
+  .logo-hint,.side-label,.side-foot{display:none;}
+  .nav{flex-direction:row;gap:4px;}
+  .nav-item{padding:9px 13px;font-size:15px;border-left:0;border-bottom:3px solid transparent;}
+  .nav-item[aria-current="true"]{border-bottom-color:var(--red);}
+  .search{margin-left:0;width:100%;}
+  .search input{width:100%;}
+  .sortwrap{margin-left:0;}
+  .tablewrap,.topbar{padding-left:14px;padding-right:14px;}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none !important;}}
+</style>
+
+<div class="fau-app">
+  <aside class="side">
+    <div class="logo-slot"><span class="logo-mark">FAU</span><span class="logo-hint">Logo asset</span></div>
+    <div class="side-label">Board</div>
+    <nav class="nav" id="nav">
+      <button class="nav-item" data-view="usa" aria-current="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M4 21V4M4 5h13l-2.5 4L17 13H4"/></svg>
+        USA</button>
+      <button class="nav-item" data-view="intl" aria-current="false">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.6 2.5 15 0 18M12 3c-2.5 2.6-2.5 15 0 18"/></svg>
+        International</button>
+      <button class="nav-item" data-view="saved" aria-current="false">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M6 3h12v18l-6-4.6L6 21z"/></svg>
+        Saved</button>
+    </nav>
+    <div class="src" id="src"></div>
+  </aside>
+
+  <main class="main">
+    <header class="topbar">
+      <div class="crumbrow">
+        <button class="back" id="back" aria-label="Go back" hidden>
+          <svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg></button>
+        <div class="crumb" id="crumb"></div>
+      </div>
+      <div class="title-row">
+        <h1 class="title" id="title">USA</h1>
+        <span class="scope" id="scope" hidden></span>
+        <span class="title-note" id="note"></span>
+        <div class="search" id="searchbox">
+          <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M16.5 16.5 21 21"/></svg>
+          <input id="q" type="search" placeholder="Search" aria-label="Search">
+        </div>
+      </div>
+      <div class="modebar" id="modebar">
+        <div class="seg" id="seg" role="group" aria-label="Show players or events">
+          <button data-mode="players" aria-pressed="true">Players</button>
+          <button data-mode="events" aria-pressed="false">Events</button>
+        </div>
+        <span class="mode-hint" id="modehint"></span>
+      </div>
+      <div class="filters" id="filters"></div>
+    </header>
+    <div class="tablewrap" id="out"></div>
+  </main>
+</div>
+
+<style>
+/* ── import layer ───────────────────────────────────────────────── */
+.src{margin-top:auto;padding:12px 14px;border-top:1px solid rgba(255,255,255,.13);
+  font-size:11.5px;line-height:1.55;color:rgba(255,255,255,.62);}
+.src b{color:#fff;font-weight:600;}
+.src .tagline{display:inline-block;margin-top:6px;padding:2px 7px;border-radius:3px;
+  font-size:10px;letter-spacing:.04em;text-transform:uppercase;}
+.src .tagline.demo{background:rgba(255,255,255,.14);color:rgba(255,255,255,.8);}
+.src .tagline.live{background:var(--red);color:#fff;}
+.src button{margin-top:9px;width:100%;padding:7px 8px;border:1px solid rgba(255,255,255,.28);
+  background:transparent;color:#fff;border-radius:5px;font:inherit;font-size:11.5px;cursor:pointer;}
+.src button:hover{background:rgba(255,255,255,.1);}
+
+.drop{position:fixed;inset:0;z-index:60;display:none;place-items:center;
+  background:rgba(0,26,54,.86);backdrop-filter:blur(3px);}
+.drop.on{display:grid;}
+.dropcard{width:min(560px,92vw);background:#fff;border-radius:10px;padding:26px 28px;
+  box-shadow:0 24px 70px rgba(0,0,0,.35);}
+.dropcard h2{margin:0 0 4px;font-size:19px;color:var(--blue);}
+.dropcard p{margin:0 0 14px;font-size:13px;color:var(--slate);line-height:1.6;}
+.dropzone{border:2px dashed #c3ced9;border-radius:8px;padding:26px 18px;text-align:center;
+  cursor:pointer;transition:border-color .15s,background .15s;}
+.dropzone:hover,.dropzone.hot{border-color:var(--blue);background:#f2f7fc;}
+.dropzone .big{font-size:14px;font-weight:600;color:var(--blue);}
+.dropzone .sm{font-size:12px;color:var(--slate-light);margin-top:5px;}
+.prog{margin-top:16px;display:none;}
+.prog.on{display:block;}
+.prog .bar{height:6px;border-radius:3px;background:#e6ecf2;overflow:hidden;}
+.prog .bar i{display:block;height:100%;width:0;background:var(--blue);transition:width .2s;}
+.prog .msg{margin-top:8px;font-size:12px;color:var(--slate);}
+.prog .msg b{color:var(--blue);}
+.dropfoot{margin-top:16px;display:flex;gap:10px;align-items:center;justify-content:flex-end;}
+.dropfoot button{padding:7px 14px;border-radius:5px;border:1px solid #c3ced9;background:#fff;
+  font:inherit;font-size:12.5px;cursor:pointer;color:var(--slate);}
+.dropfoot button.pri{background:var(--blue);border-color:var(--blue);color:#fff;}
+.dropfoot button:disabled{opacity:.45;cursor:default;}
+.droperr{margin-top:12px;padding:9px 11px;border-radius:5px;background:#fdecec;
+  border:1px solid #f3c4c4;color:#9b1c1c;font-size:12px;display:none;}
+.droperr.on{display:block;}
+.gap{margin:0 0 14px;padding:9px 11px;border-radius:5px;background:#fff8e6;
+  border:1px solid #f0dca8;color:#7a5a00;font-size:12px;line-height:1.55;}
+.ident-tag.unnamed{color:var(--slate-light);}
+.ryear{display:flex;align-items:center;gap:6px;margin-left:auto;font-size:12px;
+  color:var(--slate-light);font-family:var(--display);letter-spacing:.1em;text-transform:uppercase;}
+.ryear select{padding:5px 7px;border:1px solid var(--line);border-radius:5px;background:#fff;
+  font-family:var(--body);font-size:12.5px;letter-spacing:0;text-transform:none;
+  color:var(--slate);cursor:pointer;}
+.ryear+.seg2{margin-left:12px;}
+.rwt{margin:16px 0 0;}
+.rwt-ax{display:flex;align-items:baseline;gap:16px;margin-bottom:12px;}
+.rwt-ax:last-child{margin-bottom:0;}
+.rwt-ax dt{flex:0 0 108px;font-family:var(--display);font-size:13px;font-weight:600;
+  letter-spacing:.11em;text-transform:uppercase;color:var(--blue);}
+/* horizontal, wrapping only when the row runs out of room */
+.rwt-ax dd{margin:0;flex:1 1 auto;display:flex;flex-wrap:wrap;gap:6px 22px;}
+.rwt-row{display:inline-flex;align-items:baseline;gap:6px;line-height:1.5;white-space:nowrap;}
+.rwt-row i{font-style:normal;font-size:14px;color:var(--slate);}
+.rwt-row b{font-family:var(--data);font-size:15px;font-weight:600;color:var(--ink);
+  font-variant-numeric:tabular-nums;}
+.rwt-row u{text-decoration:none;font-family:var(--data);font-size:12.5px;
+  color:var(--slate-light);opacity:.8;}
+.rwt-row u::before{content:'(';}
+.rwt-row u::after{content:')';}
+.rvnone{font-family:var(--body);font-size:13.5px;font-weight:400;color:var(--slate-light);
+  font-style:italic;}
+.rwt-foot{margin:12px 0 0;font-size:13px;color:var(--slate-light);}
+.radarnote .thinwarn{margin-bottom:8px;}
+.radarnote .thinwarn b{color:var(--red);}
+.radarnote .thinwarn::before{content:'!';display:inline-block;width:14px;height:14px;
+  margin-right:7px;border-radius:50%;background:var(--red);color:#fff;
+  font-family:var(--display);font-size:10px;font-weight:700;line-height:14px;text-align:center;
+  vertical-align:1px;}
+.spark .pt .tipbox,.radar{--x:0;}
+.radar.blank .rring,.radar.blank .rspoke{opacity:.55;}
+.radar.blank .rlab{fill:var(--slate-light);}
+
+.pd-warn em{display:block;margin-top:5px;font-style:normal;font-weight:400;
+  opacity:.85;line-height:1.5;}
+
+/* ── trend chart hover readout ──────────────────────────────────── */
+.spark .hit{fill:transparent;}
+.spark .pt .tipbox{opacity:0;pointer-events:none;transition:opacity .12s;}
+.spark .pt:hover .tipbox,.spark .pt:focus-within .tipbox{opacity:1;}
+.spark .tipbox rect{fill:var(--blue);}
+.spark .tipbox text{font-family:var(--data);font-size:8.5px;fill:#fff;}
+.spark .tipbox .tl{fill:rgba(255,255,255,.7);}
+.spark .tipbox .tv{text-anchor:end;font-weight:600;}
+.spark .tipbox .tp{fill:rgba(255,255,255,.72);}
+.spark .tipbox .tp:nth-of-type(4){text-anchor:end;}
+.spark .xdot{fill:var(--red);opacity:.8;}
+
+.src .fixline{margin-top:7px;padding-top:7px;border-top:1px solid rgba(255,255,255,.13);}
+.src .fixline a{color:rgba(255,255,255,.8);text-decoration:underline;}
+.src .fixline a:hover{color:#fff;}
+
+/* ── pagination ─────────────────────────────────────────────────── */
+.pager{display:flex;flex-wrap:wrap;align-items:center;gap:12px;
+  padding:14px 2px 4px;border-top:1px solid var(--line);margin-top:10px;
+  font-size:12.5px;color:var(--slate-light);}
+.pager .pginfo b{color:var(--slate);font-weight:600;}
+.pgctl{display:flex;align-items:center;gap:3px;margin-left:auto;}
+.pgctl button{min-width:29px;height:29px;padding:0 7px;border:1px solid var(--line);
+  background:#fff;border-radius:5px;font:inherit;font-size:12.5px;color:var(--slate);
+  cursor:pointer;transition:background .12s,border-color .12s,color .12s;}
+.pgctl button:hover:not(:disabled){border-color:var(--blue);color:var(--blue);}
+.pgctl button:disabled{opacity:.35;cursor:default;}
+.pgctl button.on{background:var(--blue);border-color:var(--blue);color:#fff;font-weight:600;}
+.pgdots{padding:0 2px;color:var(--slate-light);}
+.pgsize{display:flex;align-items:center;gap:6px;}
+.pgsize select{padding:5px 6px;border:1px solid var(--line);border-radius:5px;
+  background:#fff;font:inherit;font-size:12.5px;color:var(--slate);cursor:pointer;}
+
+/* ── editable position ──────────────────────────────────────────── */
+.posedit{appearance:none;-webkit-appearance:none;border:1px solid transparent;
+  background:transparent;border-radius:4px;padding:2px 4px;margin:-2px 0;
+  font:inherit;font-size:12.5px;font-weight:600;color:var(--blue);
+  cursor:pointer;transition:border-color .12s,background .12s;}
+.posedit:hover,.posedit:focus{border-color:var(--line);background:#fff;outline:none;}
+.posedit:focus{border-color:var(--blue);}
+.posedit.none{color:var(--slate-light);font-weight:400;border-style:dashed;
+  border-color:#dbe3ea;}
+.posedit.none:hover{border-color:var(--blue);color:var(--blue);}
+.posedit.manual{color:var(--red);border-bottom:1px dotted var(--red);border-radius:4px 4px 0 0;}
+.posdot{display:inline-block;width:4px;height:4px;border-radius:50%;
+  background:var(--red);vertical-align:top;margin-left:1px;}
+.posedit.big{font-size:14.5px;padding:3px 6px;}
+@media (max-width:900px){
+  .src{margin-top:0;padding:0;border-top:0;font-size:0;flex:0 0 auto;}
+  .src br,.src .tagline{display:none;}
+  .src button{margin-top:0;width:auto;white-space:nowrap;font-size:11.5px;}
+}
+</style>
+
+<div class="drop" id="drop">
+  <div class="dropcard">
+    <h2>Load event database</h2>
+    <p>Everything runs in this page — the file never leaves your machine. Expects the
+       cleaned Cerebro export (<code>cerebro_clean.csv</code>), one row per player-event.</p>
+    <div class="dropzone" id="dz" tabindex="0" role="button" aria-label="Choose a CSV file">
+      <div class="big">Drop the CSV here, or click to choose</div>
+      <div class="sm">~103 MB · 189k rows · parsed, de-duplicated and indexed locally</div>
+    </div>
+    <input type="file" id="file" accept=".csv,text/csv" hidden>
+    <div class="droperr" id="droperr"></div>
+    <div class="prog" id="prog"><div class="bar"><i id="bar"></i></div>
+      <div class="msg" id="pmsg"></div></div>
+    <div class="dropfoot">
+      <button id="dropcancel">Keep prototype data</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ─────────────────────────────────────────────────────────────
+   Board membership is DERIVED FROM EVENT VENUE, not nationality.
+   A player belongs to USA if they appear in any US-soil event.
+   A player can therefore sit on both boards — that is correct.
+   ───────────────────────────────────────────────────────────── */
+
+let PLAYERS = [
+  {id:1,n:'Marcus Ellery',cls:'2026',pos:'G',ht:"6'4",hi:76,wt:180,loc:'Tampa, FL',ctry:'US',hs:'Berkeley Prep',prog:'Sunshine Elite',gp:41,ppg:19.4,rpg:4.1,apg:5.2,tp:.412,ft:.831,rec:24,st:'clean'},
+  {id:2,n:'Devonte Price',cls:'2027',pos:'F',ht:"6'8",hi:80,wt:205,loc:'Memphis, TN',ctry:'US',hs:'East HS',prog:'Team Penny',gp:33,ppg:16.2,rpg:8.9,apg:1.8,tp:.301,ft:.688,rec:18,st:'veto'},
+  {id:3,n:'Josiah Kembrell',cls:'2026',pos:'C',ht:"6'11",hi:83,wt:230,loc:'Chicago, IL',ctry:'US',hs:'Simeon',prog:'Mac Irvin Fire',gp:52,ppg:13.7,rpg:11.4,apg:1.1,tp:.190,ft:.602,rec:31,st:'clean'},
+  {id:4,n:'Trey Alonzo Jr.',cls:'2028',pos:'G',ht:"6'1",hi:73,wt:165,loc:'Houston, TX',ctry:'US',hs:'Westbury Christian',prog:'Drive Nation',gp:19,ppg:21.8,rpg:3.0,apg:6.4,tp:.377,ft:.792,rec:9,st:'review'},
+  {id:5,n:'Kai Brennan',cls:'2026',pos:'W',ht:"6'6",hi:78,wt:190,loc:'Portland, OR',ctry:'US',hs:'Jefferson',prog:'Team Loaded NW',gp:38,ppg:15.1,rpg:6.2,apg:3.3,tp:.404,ft:.744,rec:22,st:'clean'},
+  {id:6,n:'Andre Whitlock',cls:'2027',pos:'F',ht:"6'7",hi:79,wt:198,loc:'Baltimore, MD',ctry:'US',hs:'Mount Saint Joseph',prog:'Team Melo',gp:29,ppg:12.4,rpg:7.7,apg:2.1,tp:.338,ft:.711,rec:16,st:'veto'},
+  {id:7,n:'Silas Renner',cls:'2026',pos:'G',ht:"6'3",hi:75,wt:175,loc:'Phoenix, AZ',ctry:'US',hs:'Hillcrest Prep',prog:'Compton Magic',gp:44,ppg:17.9,rpg:3.8,apg:4.7,tp:.428,ft:.869,rec:27,st:'clean'},
+  {id:8,n:'Marquis Doby III',cls:'2028',pos:'W',ht:"6'5",hi:77,wt:185,loc:'Atlanta, GA',ctry:'US',hs:'Wheeler',prog:'Game Elite',gp:15,ppg:14.6,rpg:5.4,apg:2.9,tp:.352,ft:.703,rec:7,st:'review'},
+  {id:9,n:'Ethan Vasquez',cls:'2027',pos:'G',ht:"6'0",hi:72,wt:168,loc:'Miami, FL',ctry:'US',hs:'Columbus',prog:'Nightrydas Elite',gp:36,ppg:18.3,rpg:2.7,apg:5.9,tp:.391,ft:.812,rec:21,st:'clean'},
+  {id:10,n:'Bryce Kowalczyk',cls:'2026',pos:'C',ht:"6'10",hi:82,wt:225,loc:'Milwaukee, WI',ctry:'US',hs:'Brookfield Central',prog:'Phenom University',gp:31,ppg:11.2,rpg:10.1,apg:0.9,tp:.221,ft:.641,rec:19,st:'clean'},
+  {id:11,n:'Deshawn Marbury',cls:'2027',pos:'F',ht:"6'9",hi:81,wt:210,loc:'Brooklyn, NY',ctry:'US',hs:'Lincoln',prog:'PSA Cardinals',gp:27,ppg:13.9,rpg:9.2,apg:1.6,tp:.284,ft:.657,rec:14,st:'veto'},
+  {id:12,n:'Colton Reyes',cls:'2026',pos:'G',ht:"6'2",hi:74,wt:172,loc:'Las Vegas, NV',ctry:'US',hs:'Bishop Gorman',prog:'Vegas Elite',gp:40,ppg:20.5,rpg:3.4,apg:4.1,tp:.439,ft:.847,rec:25,st:'clean'},
+  {id:13,n:'Jamal Ferrante',cls:'2028',pos:'W',ht:"6'6",hi:78,wt:182,loc:'Newark, NJ',ctry:'US',hs:'Roselle Catholic',prog:'NJ Scholars',gp:12,ppg:16.7,rpg:6.0,apg:2.4,tp:.361,ft:.729,rec:6,st:'review'},
+  {id:14,n:'Owen Blackburn',cls:'2027',pos:'F',ht:"6'8",hi:80,wt:200,loc:'Indianapolis, IN',ctry:'US',hs:'Cathedral',prog:'Indy Heat',gp:34,ppg:14.8,rpg:8.1,apg:2.7,tp:.344,ft:.766,rec:20,st:'clean'},
+
+  {id:20,n:'Luka Marković',cls:'2026',pos:'F',ht:"6'9",hi:81,wt:207,loc:'Belgrade, Serbia',ctry:'RS',hs:'—',prog:'KK Mega Basket',gp:26,ppg:15.3,rpg:7.8,apg:2.2,tp:.371,ft:.774,rec:11,st:'clean'},
+  {id:21,n:'Tiago Ferreira',cls:'2027',pos:'G',ht:"6'3",hi:75,wt:176,loc:'Porto, Portugal',ctry:'PT',hs:'—',prog:'FC Porto U18',gp:22,ppg:17.1,rpg:3.2,apg:5.4,tp:.398,ft:.822,rec:8,st:'clean'},
+  {id:22,n:'Amadou Diallo',cls:'2026',pos:'C',ht:"6'10",hi:82,wt:221,loc:'Dakar, Senegal',ctry:'SN',hs:'—',prog:'NBA Academy Africa',gp:18,ppg:12.6,rpg:10.8,apg:1.0,tp:null,ft:.590,rec:6,st:'review'},
+  {id:23,n:'Jasper Lindqvist',cls:'2028',pos:'W',ht:"6'7",hi:79,wt:188,loc:'Espoo, Finland',ctry:'FI',hs:'—',prog:'Torpan Pojat',gp:14,ppg:13.4,rpg:5.9,apg:2.8,tp:.386,ft:.751,rec:5,st:'clean'},
+  {id:24,n:'Mateo Iriarte',cls:'2026',pos:'G',ht:"6'2",hi:74,wt:170,loc:'Córdoba, Argentina',ctry:'AR',hs:'—',prog:'Instituto ACC',gp:24,ppg:16.9,rpg:2.9,apg:6.1,tp:.415,ft:.858,rec:9,st:'veto'},
+  {id:25,n:'Kenji Watanabe',cls:'2027',pos:'G',ht:"6'0",hi:72,wt:163,loc:'Osaka, Japan',ctry:'JP',hs:'—',prog:'Ryukyu U18',gp:20,ppg:14.2,rpg:2.4,apg:4.8,tp:.404,ft:.803,rec:7,st:'clean'},
+  {id:26,n:'Elias Braun',cls:'2026',pos:'F',ht:"6'8",hi:80,wt:203,loc:'Munich, Germany',ctry:'DE',hs:'—',prog:'FC Bayern NBBL',gp:28,ppg:14.7,rpg:8.3,apg:2.0,tp:.352,ft:.718,rec:12,st:'clean'},
+  {id:27,n:'Noah Okonkwo',cls:'2027',pos:'C',ht:"6'11",hi:83,wt:228,loc:'Lagos, Nigeria',ctry:'NG',hs:'—',prog:'NBA Academy Africa',gp:16,ppg:11.8,rpg:9.6,apg:0.8,tp:null,ft:.612,rec:5,st:'veto'},
+];
+
+/* r = board, decided by where the event is played */
+let EVENTS = [
+  {id:'e1',r:'usa',n:'Peach Jam',d:'2026-07-25',dl:'Jul 25 – 29',loc:'North Augusta, SC',c:'Nike EYBL',tm:24,field:288,nw:31,ps:[1,3,5,7,12,10]},
+  {id:'e2',r:'usa',n:'adidas 3SSB Championship',d:'2026-07-22',dl:'Jul 22 – 26',loc:'Rock Hill, SC',c:'adidas 3SSB',tm:32,field:384,nw:44,ps:[2,6,11,14]},
+  {id:'e3',r:'usa',n:'UA Association Finals',d:'2026-07-19',dl:'Jul 19 – 23',loc:'Kissimmee, FL',c:'UA Next',tm:28,field:336,nw:39,ps:[9,13,8]},
+  {id:'e4',r:'usa',n:'NBPA Top 100 Camp',d:'2026-06-14',dl:'Jun 14 – 17',loc:'Orlando, FL',c:'Camp',tm:8,field:100,nw:12,ps:[1,7,12,3]},
+  {id:'e5',r:'usa',n:'Pangos All-American Camp',d:'2026-06-06',dl:'Jun 6 – 8',loc:'Las Vegas, NV',c:'Camp',tm:12,field:144,nw:21,ps:[4,5,10,13]},
+  {id:'e6',r:'usa',n:'EYBL Session 3',d:'2026-05-16',dl:'May 16 – 18',loc:'Kansas City, MO',c:'Nike EYBL',tm:40,field:480,nw:57,ps:[1,3,5,7,12,10]},
+  {id:'e7',r:'usa',n:'3SSB Session 2',d:'2026-05-02',dl:'May 2 – 4',loc:'Atlanta, GA',c:'adidas 3SSB',tm:36,field:432,nw:48,ps:[2,6,11,14,8]},
+  {id:'e8',r:'usa',n:'Chipotle Nationals',d:'2026-04-04',dl:'Apr 4 – 6',loc:'Indianapolis, IN',c:'HS National',tm:8,field:96,nw:6,ps:[3,9,14]},
+  {id:'e9',r:'usa',n:'Texas UIL 6A State Final',d:'2026-03-07',dl:'Mar 7',loc:'San Antonio, TX',c:'HS State',tm:2,field:26,nw:3,ps:[4]},
+  {id:'e10',r:'usa',n:'Hoophall Classic',d:'2026-01-16',dl:'Jan 16 – 19',loc:'Springfield, MA',c:'HS Showcase',tm:26,field:312,nw:19,ps:[1,11,13,9]},
+  {id:'e11',r:'usa',n:'City of Palms Classic',d:'2025-12-19',dl:'Dec 19 – 23',loc:'Fort Myers, FL',c:'HS Showcase',tm:16,field:192,nw:14,ps:[1,9,12]},
+  {id:'e12',r:'usa',n:'Nike Tournament of Champions',d:'2025-12-11',dl:'Dec 11 – 13',loc:'Phoenix, AZ',c:'HS Showcase',tm:32,field:384,nw:28,ps:[7,10,5]},
+  /* US soil → USA board, even though the fields are international */
+  {id:'e13',r:'usa',n:'NBA Academy Games',d:'2026-06-20',dl:'Jun 20 – 24',loc:'Atlanta, GA',c:'Academy',tm:12,field:144,nw:18,ps:[22,27,25,8]},
+  {id:'e14',r:'usa',n:'Nike Hoop Summit',d:'2026-04-11',dl:'Apr 11',loc:'Portland, OR',c:'All-Star',tm:2,field:24,nw:5,ps:[20,22,24,1,12]},
+
+  /* ── prior seasons (season = Sept 1 cutover; 2025-12 → season 2026) ── */
+  {id:'p1',r:'usa',n:'Peach Jam',d:'2025-07-19',dl:'Jul 19 – 23',loc:'North Augusta, SC',c:'Nike EYBL',tm:24,field:288,nw:29,ps:[1,3,5,7,12,10,2,9]},
+  {id:'p2',r:'usa',n:'adidas 3SSB Championship',d:'2025-07-16',dl:'Jul 16 – 20',loc:'Rock Hill, SC',c:'adidas 3SSB',tm:32,field:384,nw:41,ps:[2,6,11,14]},
+  {id:'p3',r:'usa',n:'NBPA Top 100 Camp',d:'2025-06-11',dl:'Jun 11 – 14',loc:'Orlando, FL',c:'Camp',tm:8,field:100,nw:14,ps:[1,7,12]},
+  {id:'p4',r:'usa',n:'EYBL Session 2',d:'2025-05-09',dl:'May 9 – 11',loc:'Indianapolis, IN',c:'Nike EYBL',tm:40,field:480,nw:52,ps:[1,3,5,7,12,10,11]},
+  {id:'p5',r:'usa',n:'Hoophall Classic',d:'2025-01-17',dl:'Jan 17 – 20',loc:'Springfield, MA',c:'HS Showcase',tm:26,field:312,nw:22,ps:[1,9,11,3]},
+  {id:'p6',r:'usa',n:'City of Palms Classic',d:'2024-12-18',dl:'Dec 18 – 22',loc:'Fort Myers, FL',c:'HS Showcase',tm:16,field:192,nw:16,ps:[1,12,9]},
+  {id:'p7',r:'usa',n:'Peach Jam',d:'2024-07-20',dl:'Jul 20 – 24',loc:'North Augusta, SC',c:'Nike EYBL',tm:24,field:288,nw:34,ps:[1,3,5,7,12,10]},
+  {id:'p8',r:'usa',n:'EYBL Session 1',d:'2024-04-26',dl:'Apr 26 – 28',loc:'Phoenix, AZ',c:'Nike EYBL',tm:40,field:480,nw:61,ps:[1,3,5,7,10,12]},
+  {id:'p9',r:'usa',n:'City of Palms Classic',d:'2023-12-19',dl:'Dec 19 – 23',loc:'Fort Myers, FL',c:'HS Showcase',tm:16,field:192,nw:18,ps:[1,3,12]},
+
+  {id:'q1',r:'intl',n:'FIBA U17 European Championship',d:'2025-07-04',dl:'Jul 4 – 12',loc:'Skopje, N. Macedonia',c:'FIBA',tm:16,field:192,nw:24,ps:[20,21,26,23]},
+  {id:'q2',r:'intl',n:'ANGT Finals',d:'2025-05-16',dl:'May 16 – 18',loc:'Kaunas, Lithuania',c:'EuroLeague ANGT',tm:8,field:96,nw:13,ps:[20,26,21]},
+  {id:'q3',r:'intl',n:'FIBA U16 European Championship',d:'2024-08-08',dl:'Aug 8 – 16',loc:'Tampere, Finland',c:'FIBA',tm:16,field:192,nw:20,ps:[20,21,26]},
+  {id:'i1',r:'intl',n:'FIBA U18 EuroBasket Div. A',d:'2026-08-02',dl:'Aug 2 – 10',loc:'Heraklion, Greece',c:'FIBA',tm:16,field:192,nw:23,ps:[20,21,26,23]},
+  {id:'i2',r:'intl',n:'FIBA U17 World Cup',d:'2026-07-05',dl:'Jul 5 – 13',loc:'Istanbul, Türkiye',c:'FIBA',tm:16,field:192,nw:26,ps:[21,24,25,27]},
+  {id:'i3',r:'intl',n:'adidas Eurocamp',d:'2026-06-05',dl:'Jun 5 – 7',loc:'Treviso, Italy',c:'Camp',tm:8,field:96,nw:14,ps:[20,26,23]},
+  {id:'i4',r:'intl',n:'ANGT Finals',d:'2026-05-22',dl:'May 22 – 24',loc:'Berlin, Germany',c:'EuroLeague ANGT',tm:8,field:96,nw:11,ps:[20,26,21]},
+  {id:'i5',r:'intl',n:'BWB Europe Camp',d:'2026-03-20',dl:'Mar 20 – 22',loc:'Belgrade, Serbia',c:'Camp',tm:4,field:64,nw:9,ps:[20,23,26]},
+  {id:'i6',r:'intl',n:'FIBA U16 European Championship',d:'2025-08-10',dl:'Aug 10 – 18',loc:'Tampere, Finland',c:'FIBA',tm:16,field:192,nw:21,ps:[23,25]},
+];
+
+/* Top-150 per class only — most players are unranked.
+   Three states per service, and they are not the same thing:
+     number      the player's rank
+     null        the list was fetched in full and he is not on it — a real NR
+     key absent  that service could not be read this build — say nothing, draw —
+   A whole entry of {amb:true} means more than one prospect in that class shares
+   the name and neither high school nor state could separate them, so no rank is
+   attached at all. A wrong rank is worse than a missing one.
+   Produced by hs_hoops_rankings.py build_snapshot(); feed it through
+   applyRankSnapshot(). The literal below is sample data. */
+let RANKS={
+  1:{espn:14,c247:11,on3:17}, 12:{espn:9,c247:12,on3:8},  3:{espn:22,c247:25,on3:19},
+  7:{espn:31,c247:28,on3:35}, 2:{espn:37,c247:41,on3:33}, 5:{espn:48,c247:51,on3:44},
+  9:{espn:62,c247:58,on3:66}, 10:{espn:88,c247:94,on3:79},
+  4:{espn:19,c247:null,on3:24},                 /* partial coverage */
+  20:{espn:41,c247:39,on3:45},
+};
+/* When the snapshot was built, and whether each service was reachable at all.
+   Only used for wording — per-player availability lives in RANKS itself. */
+let RANKMETA={asOf:null,services:{}};
+
+const IDENT={
+  clean:{tag:'Clean',txt:'All event records matched on name plus hometown. No split rule fired.'},
+  veto:{tag:'Veto merge',txt:'A split rule fired but was overridden — these records share a team or teammates, so they resolve to one player.'},
+  review:{tag:'Review',txt:'Records conflict on a split rule and no teammate overlap was found. Sitting in 争议赛事_需确认.'},
+  unnamed:{tag:'Unnamed',txt:'The source records a team and a shirt number where the name should be, so these rows cannot be tied to a person. Not counted in any peer group.'}
+};
+/* ═══ STAT COLUMNS ═══════════════════════════════════════════════
+   One list, read by the board, the event roster and the player detail page.
+   Counting stats divide by games (Per G) or by minutes x 40 (Per 40).
+   The four percentages are makes over attempts and are identical under both
+   modes, so they carry no suffix. Everything derives from TOTALS: a season
+   percentage is season makes over season attempts, never a mean of per-event
+   percentages. */
+const COLS=[
+  {k:'pts',l:'Pts'},{k:'reb',l:'Reb'},{k:'ast',l:'Ast'},{k:'stl',l:'Stl'},
+  {k:'blk',l:'Blk'},{k:'to',l:'To'},{k:'pf',l:'PF'},
+  {k:'fgp',l:'FG%', m:'fgm',a:'fga'},
+  {k:'p2p',l:'2PT%',m:'twm',a:'twa'},
+  {k:'p3p',l:'3PT%',m:'tpm',a:'tpa'},
+  {k:'ftp',l:'FT%', m:'ftm',a:'fta'},
+];
+const SUMKEYS=['g','min','pts','reb','ast','stl','blk','to','pf','orb',
+               'fgm','fga','twm','twa','tpm','tpa','ftm','fta','usgn','usgd'];
+
+/* ═══ TREND ══════════════════════════════════════════════════════
+   The six charts on the player page. Every one is a ratio, so each is a
+   single division of two sums and none of them moves when Per G / Per 40
+   is toggled. Formulas verified row-by-row against the source's own
+   columns: 3PT R and FT R match 100.00%, TS% 100.00%, eFG% 99.99%,
+   3PT% 99.98%, USG% within 0.0003 on the median row. */
+const FT_POSS_UI=0.44;
+const TREND=[
+  {k:'usg', l:'USG%',  f:a=>a.usgd?a.usgn/a.usgd:null},
+  {k:'3ptr',l:'3PT R', f:a=>a.fga?a.tpa/a.fga:null},
+  {k:'ftr', l:'FT R',  f:a=>a.fga?a.fta/a.fga:null},
+  {k:'p3',  l:'3PT%',  f:a=>a.tpa?a.tpm/a.tpa:null},
+  {k:'efg', l:'eFG%',  f:a=>a.fga?(a.fgm+0.5*a.tpm)/a.fga:null},
+  {k:'ts',  l:'TS%',   f:a=>{const d=2*(a.fga+FT_POSS_UI*a.fta);return d?a.pts/d:null;}},
+];
+
+/* ═══ RADAR ══════════════════════════════════════════════════════
+   Five axes, each a weighted blend. Every component becomes a percentile
+   inside the peer pool first — makes per 40, a shooting rate and a foul
+   rate cannot be averaged directly — and the blend is then ranked again,
+   so an axis reads as a true percentile rather than a value squashed
+   toward the middle.
+
+   NO SHRINKAGE. Rates are used exactly as the season produced them.
+   Split-half reliability across 12,518 player-seasons says shrinking them
+   buys almost nothing once the weights are in place: 0.609 without any,
+   0.619 with k=55/70/27/20.
+
+   A ZERO IS NOT MISSING DATA. Never attempting a three, never drawing a
+   foul, never assisting — each is a fact about the player, so it sits at
+   the floor of the pool rather than being pulled up to the average.
+
+   WEIGHTS ARE VALIDATED BY WHETHER THE SCORE TRAVELS WITH THE PLAYER.
+   8,939 player-seasons in this file were spent across two different teams
+   — a school side and a club side in the same year. Scoring each half
+   separately and correlating them asks the only question that matters for
+   a scouting profile: is this the player, or is it his team? Repeatability
+   alone cannot tell them apart. A metric can be perfectly stable and still
+   be describing a system.
+
+   How far each part travels on its own:
+     3PT R .79   REB/40 .64   OREB/40 .59   2PM/40 .58   AST/40 .58
+     BLK/40 .56  DREB/40 .53  PF/40 .42     STL/40 .38   FT R .37
+     OREB/REB .37   AST/TO .37   3PT% .29   2PT% .24     FT% .23
+
+   Two findings shaped the weights below. Rebounding splits cleanly into
+   volume and mix: REB/40 and OREB/REB correlate only .22, while OREB/40
+   and OREB/REB correlate .78 and say the same thing twice. And the three
+   shooting percentages are the least portable numbers in the file, which
+   is why accuracy is carried by two of them together — 3PT% and FT% are
+   nearly independent (r .09), so averaging them lifts the accuracy signal
+   from .29 and .23 to .36.
+
+   Where the arithmetic and the game disagree, the game wins and the cost
+   is stated. Maximising portability alone hands Shooting 94% to 3PT R,
+   which would rank a 30% gunner above a 42% shooter who picks his spots;
+   the axis would measure willingness, not accuracy. Fouls cost 0.026 of
+   portability at a weight of .10, kept because foul control is part of
+   reading a defender. */
+/* Which optional columns the loaded file actually carried. A column that is not
+   there is not a column of zeros — reporting "no offensive rebounds" for every
+   player because the export omitted ORB would be inventing a fact. The component
+   drops out instead and the axis renormalises over what is left. */
+const SRC={orb:true};
+
+const RADAR_MIN_MIN=20;        /* qualified minutes in the season, else no radar */
+const rate40=(a,k)=>{const s=a.q||a; return s.min>0?s[k]/s.min*40:null;};
+const ratio=(m,d)=>d>0?m/d:0;                    /* no attempts is a real zero */
+
+const RADAR=[
+ /* FT R sits at .10 because it barely measures finishing. Across 76,000
+    player-seasons it correlates .098 with 2PT% and .179 with 2PM/40 — it tracks
+    whether a player draws whistles, not whether he converts. At .30 it cost the
+    good finishers who do not draw them a median 24.6 percentiles against equally
+    good finishers who do. Youth officiating also swings hard between school and
+    club play, which is why it travels worst of the three across a change of team
+    (.37 against .58 for 2PM/40). Kept, because getting to the line is still part
+    of attacking the rim, but it no longer decides the axis. */
+ {l:'Finishing', c:[
+   {w:.60, l:'2PM/40', t:'40', f:a=>rate40(a,'twm')},
+   {w:.30, l:'2PT%',   t:'p',  f:a=>ratio(a.twm,a.twa),  z:a=>a.twa===0},
+   {w:.10, l:'FT R',   t:'p',  f:a=>ratio(a.fta,a.fga),  z:a=>a.fta===0}]},
+ /* FTM/40 is here because a percentage alone cannot separate a shooter from a
+    fluke: a third of the players who clear the radar floor took four free throws
+    or fewer, and 31% of those made every one. Volume answers what the rate cannot
+    — the fluke has no free throws to show, the real shooter does. */
+ {l:'Shooting', c:[
+   {w:.40, l:'3PT%',   t:'p',  f:a=>ratio(a.tpm,a.tpa),  z:a=>a.tpa===0},
+   {w:.30, l:'3PT R',  t:'p',  f:a=>ratio(a.tpa,a.fga),  z:a=>a.tpa===0},
+   {w:.20, l:'FT%',    t:'p',  f:a=>ratio(a.ftm,a.fta),  z:a=>a.fta===0},
+   {w:.10, l:'FTM/40', t:'40', f:a=>rate40(a,'ftm')}]},
+ {l:'Playmaking', c:[
+   {w:.70, l:'AST/40', t:'40', f:a=>rate40(a,'ast'),     z:a=>a.ast===0},
+   {w:.30, l:'AST/TO', t:'x',  f:a=>a.ast/Math.max(a.to,1), z:a=>a.ast===0}]},
+ /* volume and mix, not two volumes: REB/40 and OREB/REB share only .22,
+    where OREB/40 and OREB/REB share .78 and would count the same boards
+    twice. Offensive boards are the ones a player has to go and take. */
+ {l:'Rebounding', c:[
+   {w:.60, l:'REB/40',   t:'40', f:a=>rate40(a,'reb')},
+   {w:.40, l:'OREB/REB', t:'p',  f:a=>SRC.orb?ratio(a.orb,a.reb):null, z:a=>a.reb===0}]},
+ /* fouls count against the player, so this one is ranked upside down */
+ {l:'Defense', c:[
+   {w:.40, l:'STL/40', t:'40', f:a=>rate40(a,'stl')},
+   {w:.50, l:'BLK/40', t:'40', f:a=>rate40(a,'blk')},
+   {w:.10, l:'PF/40',  t:'40', f:a=>rate40(a,'pf'), inv:true}]},
+];
+const colLabel=(c,pr)=>(c.a||c.f)?c.l:c.l+(pr==='40'?'/40':'/G');
+const sortOpts=extra=>[...COLS.map(c=>[c.k,colLabel(c,per)]),...extra];
+const SORT_BOARD =()=>sortOpts([['rec','Event records'],['g','Games played'],
+  ['min','Minutes played'],['cls','Class · soonest'],['hi','Height · tallest'],['n','Name · A–Z']]);
+const SORT_ROSTER=()=>sortOpts([['g','Games'],['min','Minutes'],
+  ['hi','Height · tallest'],['cls','Class · soonest'],['n','Name · A–Z']]);
+const MON=['January','February','March','April','May','June','July','August','September','October','November','December'];
+const MON3=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
+/* ═══════════════════════════════════════════════════════════════
+   LOCAL IMPORT — cerebro_clean.csv → boards, in this page only
+   ═══════════════════════════════════════════════════════════════
+   Nothing is uploaded. The file is streamed, parsed, run through the
+   默认同人版 identity rules and indexed entirely in the browser.
+
+   SPLIT RULES (a name group stays ONE player unless one of these fires
+   and no veto overrides it):
+     D1  DOB more than 2 days apart
+     D2  hometown city AND state both differ
+     D3  class year gap of 2 or more
+     D4  height gap > 2 × year-span + 7 inches
+     VETO  same team, or a shared teammate — beats every split rule
+   Rejected as evidence: high school (transfers), position, weight, Playerkey.
+   ═══════════════════════════════════════════════════════════════ */
+
+const IMPORT={active:false,file:'',rows:0,players:0,events:0,dropped:0};
+
+/* Optional — read when present, never required, so an export without them still
+   imports cleanly. MP guards against corrupt MIN/G values; the TEAM columns feed
+   USG% and nothing else, so without them that one trend chart simply goes empty. */
+const OPTIONAL=['MP','ORB','TEAM FGA','TEAM FTA','TEAM MP','TEAM TO'];
+
+/* Possession coefficient. Confirmed against the source's own TS% and USG%
+   columns: 0.44 reproduces both, 0.475 and 0.5 do not. */
+const FT_POSS=0.44;
+
+/* Which columns we actually read. Everything else is skipped. */
+const NEED=['EVENT ABR','Player','Team','POSITION','CLASS','DOB','HOMETOWN','HIGHSCHOOL',
+            'INCH HEIGHT','Year','G','MIN/G','PTS','REB','AST','STL','BLK','TO','PF',
+            'FGM','FGA','2PM','2PA','3PM','3PA','FTM','FTA'];
+
+/* Venue is NOT a column in this export, so the board has to be inferred from the
+   event name. Edit this list as international events enter the database. */
+const INTL_RX=/eurocamp|fiba\b|basketball without borders|\bbwb\b|\bangt\b|next generation tournament|world cup|u1[6-9]\s+(european|world)|albert schweitzer/i;
+
+/* Circuit buckets, first match wins. */
+const CIRC_RX=[
+  ['Nike EYBL',    /nike eybl|\beybl\b|eycl/i],
+  ['adidas 3SSB',  /3ssb/i],
+  ['UA Next',      /under armour|ua next|\buaa\b/i],
+  ['Overtime Elite',/overtime elite/i],
+  ['Grind Session',/grind session/i],
+  ['Phenom',       /phenom/i],
+  ['NY2LA',        /ny2la/i],
+  ['GASO',         /gaso|2 cities 1/i],
+  ['Prep Hoops',   /prep hoops/i],
+  ['Puma Pro16',   /puma|pro16/i],
+  ['HS State',     /\((uil|kshsaa|nchsaa|nmaa|ghsa|fhsaa|chsaa|ihsa|miaa|piaa|vhsl|visaa|nepsac|cif|ohsaa|tapps|wpial|mhsaa|shsaa|ahsaa|lhsaa)\)|class \d|state (championship|final|tournament|playoff)/i],
+  ['HS Showcase',  /showcase|classic|hoopfest|invitational|shootout|challenge|jamboree|tip.?off|summit|city of palms|hoophall|extravaganza|flyin to the hoop/i],
+  ['Camp',         /\bcamp\b|top 100|all.?american|combine/i],
+  ['League',       /league|conference|circuit|scholastic|nibc/i],
+];
+const circOf=n=>{for(const [l,rx] of CIRC_RX) if(rx.test(n)) return l; return 'Grassroots';};
+/* An event where the listed team is the player's school, not a club. */
+const HS_CIRC=new Set(['HS State','HS Showcase','League','HS National']);
+/* A team name ending in a state code is a school: 1,025 such names appear in the
+   file, 69% of them also turn up verbatim in the HIGHSCHOOL field, and not one of
+   the 72 all-star style names ("Team Air", "East", "World") carries one. */
+const STATE_TAIL=/\((A[LKZR]|C[AOT]|D[CE]|FL|GA|HI|I[ADLN]|K[SY]|LA|M[ADEINOST]|N[CDEHJMVY]|O[HKR]|PA|RI|S[CD]|T[NX]|UT|V[AT]|W[AIVY])\)\s*$/;
+/* The rosters a player is drafted onto for one night. Cooper Flagg has no
+   HIGHSCHOOL value on any of his 31 rows and the last team he wore was "Team Air"
+   at the Jordan Brand Classic. Matched whole, so Westminster and North Rowan stay. */
+const NOT_A_SCHOOL=/^\s*(east|west|north|south|usa|world|home|away|team\s+\S+|(usa|world|team)\s.*|.*all[- ]?stars?|.*\sselect|black|white|blue|red|green|gold|silver|navy|orange|purple|maroon)\s*$/i;
+
+/* ── CSV → records, streamed so a 100 MB file never lands in one string ── */
+function splitLine(s){
+  if(s.indexOf('"')===-1) return s.split(',');
+  const out=[]; let f='',q=false;
+  for(let i=0;i<s.length;i++){
+    const c=s[i];
+    if(q){ if(c==='"'){ if(s[i+1]==='"'){f+='"';i++;} else q=false; } else f+=c; }
+    else if(c==='"') q=true;
+    else if(c===','){ out.push(f); f=''; }
+    else f+=c;
+  }
+  out.push(f); return out;
+}
+const countQ=s=>{let n=0,i=-1;while((i=s.indexOf('"',i+1))!==-1)n++;return n;};
+
+async function readCSV(file,onLine,onProgress){
+  const dec=new TextDecoder('utf-8');
+  const reader=file.stream().getReader();
+  let buf='',read=0,first=true;
+  for(;;){
+    const {done,value}=await reader.read();
+    if(done) break;
+    read+=value.length;
+    buf+=dec.decode(value,{stream:true});
+    let start=0,pos=0;
+    for(;;){
+      let nl=buf.indexOf('\n',pos);
+      if(nl===-1) break;
+      let line=buf.slice(start,nl);
+      if(line.charCodeAt(line.length-1)===13) line=line.slice(0,-1);   // CRLF
+      if(countQ(line)%2===1){ pos=nl+1; continue; }   // newline sat inside quotes
+      if(first){ first=false; onLine(line.replace(/^\uFEFF/,''),true); }
+      else onLine(line,false);
+      start=pos=nl+1;
+    }
+    buf=buf.slice(start);
+    await onProgress(read/file.size);
+  }
+  buf+=dec.decode();
+  if(buf.trim()) onLine(buf,false);
+}
+
+/* ── the whole pipeline ─────────────────────────────────────────── */
+async function importCSV(file,say){
+  const t0=performance.now();
+  let col=null, idx={};
+  // per-row parallel arrays — objects for 189k rows are needlessly heavy
+  const ev=[],evI=new Map();                 // event name → index
+  const nmS=[],nmI=new Map();                // normalised name → id
+  const tmS=[],tmI=new Map();                // team string → id
+  const R={e:[],nm:[],tm:[],raw:[],pos:[],cls:[],dob:[],city:[],st:[],ht:[],
+           g:[],min:[],pts:[],reb:[],ast:[],stl:[],blk:[],to:[],pf:[],orb:[],
+           fgm:[],fga:[],twm:[],twa:[],tpm:[],tpa:[],ftm:[],fta:[],
+           usgn:[],usgd:[],hs:[],loc:[],sch:[],ph:[]};
+  let bad=0;
+
+  const intern=(s,arr,map)=>{ if(s===''||s==null) return -1;
+    let i=map.get(s); if(i===undefined){i=arr.length;arr.push(s);map.set(s,i);} return i; };
+  const num=v=>{const x=+v; return Number.isFinite(x)?x:0;};
+  const col2=(k,f)=>idx[k]===undefined?0:num(f[idx[k]]);
+
+  await readCSV(file,(line,isHead)=>{
+    const f=splitLine(line);
+    if(isHead){
+      col=f.map(s=>s.trim());
+      NEED.concat(OPTIONAL).forEach(k=>{const i=col.indexOf(k); if(i>=0) idx[k]=i;});
+      SRC.orb = idx['ORB']!==undefined;
+      const miss=NEED.filter(k=>!(k in idx));
+      if(miss.length) throw new Error('Missing column'+(miss.length>1?'s':'')+': '+miss.join(', '));
+      return;
+    }
+    const name=(f[idx['Player']]||'').trim();
+    const evn =(f[idx['EVENT ABR']]||'').trim();
+    if(!name||!evn){bad++;return;}
+
+    let e=evI.get(evn);
+    if(e===undefined){e=ev.length;ev.push({n:evn});evI.set(evn,e);}
+
+    /* Digits stay in the key. ~2,200 rows carry a team and jersey number in place
+       of a name ("Ubel - 816 Hoops 12"); stripping digits collapsed 29 of those
+       into a single fictional player. Real names never contain digits. */
+    const norm=name.toLowerCase().replace(/[^a-z0-9 ]/g,' ').replace(/\s+/g,' ').trim();
+    const teamRaw=(f[idx['Team']]||'').trim();
+    /* "Ubel - 816 Hoops 12", "CBG 460 97" — a team plus a shirt number, not a person. */
+    R.ph.push(/\d/.test(name) || norm===teamRaw.toLowerCase().replace(/[^a-z0-9 ]/g,' ').replace(/\s+/g,' ').trim());
+    R.e.push(e);
+    R.nm.push(intern(norm,nmS,nmI));
+    R.raw.push(name);
+    R.tm.push(intern(teamRaw,tmS,tmI));
+
+    const p=(f[idx['POSITION']]||'').trim();
+    R.pos.push(p);
+    const c=parseInt(f[idx['CLASS']],10);
+    R.cls.push(c>=2015&&c<=2035?c:-1);
+    const d=(f[idx['DOB']]||'').trim();
+    let dd=-1;
+    if(d){const m=d.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+      if(m) dd=Date.UTC(+m[3],+m[1]-1,+m[2])/86400000;}
+    R.dob.push(dd);
+    const hm=(f[idx['HOMETOWN']]||'').trim();
+    R.loc.push(hm);
+    const hmm=hm.match(/^(.*?)\s*\(([A-Za-z.]{2,4})\)\s*$/);
+    R.city.push(hmm?hmm[1].toLowerCase().trim():'');
+    R.st.push(hmm?hmm[2].toUpperCase():'');
+    R.sch.push((f[idx['HIGHSCHOOL']]||'').trim());
+    const h=+f[idx['INCH HEIGHT']];
+    R.ht.push(h>=55&&h<=95?h:-1);
+    const y=parseFloat(f[idx['Year']]);
+    R.hs.push(Number.isFinite(y)?y:-1);
+
+    const gN=num(f[idx['G']]);
+    R.g.push(gN);
+    /* Total minutes = MIN/G x G. Not MP: MP is the total rounded to a whole
+       number, so dividing by it does not reproduce the source's own /40 figures,
+       while MIN/G keeps a decimal and does.
+       MP is still read as a corruption check. On 17 rows MIN/G is broken — G=1
+       with MIN/G=744 while MP says 29 — and there MP is right every time. */
+    const mpg=num(f[idx['MIN/G']]), mp=idx['MP']===undefined?0:num(f[idx['MP']]);
+    let mins=mpg*gN;
+    if(mp>0 && Math.abs(mins-mp) > 1+0.05*gN) mins=mp;
+    R.min.push(mins);
+    R.pts.push(num(f[idx['PTS']]));  R.reb.push(num(f[idx['REB']]));
+    R.ast.push(num(f[idx['AST']]));  R.stl.push(num(f[idx['STL']]));
+    R.blk.push(num(f[idx['BLK']]));  R.to .push(num(f[idx['TO']]));
+    R.pf .push(num(f[idx['PF']])); R.orb.push(col2('ORB',f));
+    /* USG% is the only metric that needs team context, and it cannot be averaged
+       across events — it is possessions the player used over team possessions
+       while he was on the floor. Store that ratio's two halves per row so the
+       season and career figures are one division of two sums, like everything
+       else. Rows without team minutes contribute nothing to either half. */
+    const tmMp=col2('TEAM MP',f), tmFga=col2('TEAM FGA',f),
+          tmFta=col2('TEAM FTA',f), tmTo=col2('TEAM TO',f);
+    const usable=tmMp>0 && mins>0;
+    R.usgn.push(usable ? num(f[idx['FGA']])+FT_POSS*num(f[idx['FTA']])+num(f[idx['TO']]) : 0);
+    R.usgd.push(usable ? (mins/(tmMp/5))*(tmFga+FT_POSS*tmFta+tmTo) : 0);
+
+    R.fgm.push(num(f[idx['FGM']])); R.fga.push(num(f[idx['FGA']]));
+    R.twm.push(num(f[idx['2PM']])); R.twa.push(num(f[idx['2PA']]));
+    R.tpm.push(num(f[idx['3PM']])); R.tpa.push(num(f[idx['3PA']]));
+    R.ftm.push(num(f[idx['FTM']])); R.fta.push(num(f[idx['FTA']]));
+  }, async pct=>{ await say('Reading '+file.name, pct*0.42); });
+
+  const N=R.e.length;
+  if(!N) throw new Error('No usable rows found — is this the cleaned Cerebro export?');
+  await say('Dating '+ev.length.toLocaleString()+' events', .45);
+
+  /* ── event dates: Year is YYYY.MM; the name prefix is the tie-breaker ── */
+  const ymCount=ev.map(()=>new Map());
+  for(let i=0;i<N;i++){
+    if(R.hs[i]<0) continue;
+    const y=Math.floor(R.hs[i]), m=Math.round((R.hs[i]-y)*100);
+    const k=y*100+(m>=1&&m<=12?m:0);
+    const mp=ymCount[R.e[i]]; mp.set(k,(mp.get(k)||0)+1);
+  }
+  ev.forEach((e,i)=>{
+    let best=0,bn=-1;
+    ymCount[i].forEach((n,k)=>{if(n>bn){bn=n;best=k;}});
+    let y=Math.floor(best/100), m=best%100;
+    /* One event, "2022 The Stage (17U)", carries a year with no month at all
+       (Year = 2022.0 across all 344 rows). July is the default because that is
+       when the summer circuit runs; it is a stated assumption, not a reading. */
+    if(m<1||m>12) m=7;
+    /* The event name carries the year, and it is the more reliable of the two.
+       The Year column is hand-entered and drifts: a "2023 Governors Challenge"
+       arrived stamped 2019.02, four years out, and nothing in the old check
+       caught it because 2019 is a perfectly ordinary year.
+
+       A name like "2022-23 ..." states the season outright, so the calendar year
+       follows from the month — Sept-Dec is the first year, Jan-Aug the second.
+       843 of the 847 events named that way already agree with their Year column,
+       and the rule repairs the four that do not: a 2012 typo, a 2025 stamp on a
+       2023-24 league, and a Kansas tournament stamped a year early.
+
+       A single-year name allows the date to sit one year either side of it,
+       because a December event is often branded for the season it belongs to —
+       "2026 Bass Pro TOC" really is played in December 2025, and there the Year
+       column is right. Beyond that window the column is treated as broken and
+       the name wins. All 758 single-year events in the source pass the window;
+       the check exists for the ones that will not. */
+    const sp=e.n.match(/^(\d{4})-(\d{2})\b/);
+    const one=e.n.match(/^(\d{4})[\s\-]/);
+    if(sp) y = m>=9 ? +sp[1] : 2000 + +sp[2];
+    else if(one){ const ny=+one[1]; if(!(y>=ny-1&&y<=ny+1)) y=ny; }
+    else if(y<2015||y>2027) y=2024;
+    e.y=y; e.m=m; e.ym=y*100+m;
+    e.c=circOf(e.n); e.b=INTL_RX.test(e.n)?'intl':'usa';
+    e.isHS=HS_CIRC.has(e.c);
+  });
+  for(let i=0;i<N;i++) R.hs[i]=ev[R.e[i]].y;      // reuse the slot for the event year
+
+  /* ── identity resolution ─────────────────────────────────────── */
+  await say('Grouping '+nmS.length.toLocaleString()+' names', .50);
+  const byName=new Map();
+  for(let i=0;i<N;i++){
+    const k=R.nm[i]; let a=byName.get(k); if(!a){a=[];byName.set(k,a);} a.push(i);
+  }
+  // (event, team) rosters power the teammate veto
+  const roster=new Map();
+  for(let i=0;i<N;i++){
+    const k=R.e[i]*100000+R.tm[i];
+    let s=roster.get(k); if(!s){s=new Set();roster.set(k,s);} s.add(R.nm[i]);
+  }
+  const conflict=(i,j)=>{
+    if(R.dob[i]>=0&&R.dob[j]>=0&&Math.abs(R.dob[i]-R.dob[j])>2) return true;             // D1
+    if(R.city[i]&&R.city[j]&&R.st[i]&&R.st[j]&&R.city[i]!==R.city[j]&&R.st[i]!==R.st[j]) return true; // D2
+    if(R.cls[i]>0&&R.cls[j]>0&&Math.abs(R.cls[i]-R.cls[j])>=2) return true;               // D3
+    if(R.ht[i]>0&&R.ht[j]>0&&Math.abs(R.ht[i]-R.ht[j])>2*Math.abs(R.hs[i]-R.hs[j])+7) return true; // D4
+    return false;
+  };
+  const veto=(i,j)=>{
+    if(R.tm[i]<0||R.tm[j]<0) return false;                          // no team, no evidence
+    if(R.tm[i]===R.tm[j]) return true;                                                    // same team
+    const a=roster.get(R.e[i]*100000+R.tm[i]), b=roster.get(R.e[j]*100000+R.tm[j]);
+    if(!a||!b||a===b) return a===b&&a!=null;
+    const [s,l]=a.size<=b.size?[a,b]:[b,a];
+    for(const v of s) if(v!==R.nm[i]&&l.has(v)) return true;                               // shared teammate
+    return false;
+  };
+
+  const par=new Int32Array(N); for(let i=0;i<N;i++) par[i]=i;
+  const find=x=>{while(par[x]!==x){par[x]=par[par[x]];x=par[x];}return x;};
+  const uni=(a,b)=>{a=find(a);b=find(b);if(a!==b)par[b]=a;};
+  const vetoRoot=new Set(), splitRoot=new Set();
+
+  let done=0;
+  for(const [,idxs] of byName){
+    const k=idxs.length;
+    if(k>1){
+      const conf=[];
+      for(let a=0;a<k;a++) for(let b=a+1;b<k;b++){
+        const i=idxs[a],j=idxs[b];
+        const cf=conflict(i,j);
+        if(cf) conf.push(i,j);
+        if(!cf||veto(i,j)) uni(i,j);
+      }
+      const roots=new Set(); for(const i of idxs) roots.add(find(i));
+      if(roots.size>1) for(const r of roots) splitRoot.add(r);
+      /* a pair that conflicted but still landed in one player = the merge was
+         upheld, whether by a direct veto or through a chain of clean rows */
+      for(let z=0;z<conf.length;z+=2){
+        const r=find(conf[z]); if(r===find(conf[z+1])) vetoRoot.add(r);
+      }
+    }
+    if((++done&2047)===0) await say('Resolving identities', .50+.28*done/byName.size);
+  }
+
+  /* ── collapse rows into players ──────────────────────────────── */
+  await say('Building player records', .80);
+  const rootId=new Map(); const P=[];
+  const order=Array.from({length:N},(_,i)=>i).sort((a,b)=>ev[R.e[a]].ym-ev[R.e[b]].ym);
+  const rowsOf=[];                       // row indices per player, dropped after the shape check
+  /* Two pools only — high-school listings are not granular enough to carry four.
+     The source spells position 34 ways ("Pg", "G,F", "SF`", "G/FF"), so normalise
+     hard first, then fall back on the letters present.
+
+     Where the line falls is set by height, not by convention. Mean inches by
+     listing run PG 72.2 · G 73.1 · SG 74.7 ‖ G/F 76.0 · GF 76.1 · SF 77.2 ·
+     F 77.7 · PF 78.8 · C 81.0 — the widest gap sits between SG and G/F, so the
+     wings pool with the forwards. Move SF / G/F / GF back up here to change it. */
+  const POSMAP={PG:'G',SG:'G',G:'G',CG:'G','PG/SG':'G','P/G':'G',GPG:'G',P:'G','G/P':'G',
+    SF:'F','G/F':'F',GF:'F','G/F/F':'F','G/FF':'F','SG/SF':'F',W:'F','F/G':'F',
+    F:'F',PF:'F','F/C':'F','PF/C':'F','PF/SF':'F',FC:'F','F/F':'F','SF/PF':'F',
+    C:'F','C/F':'F'};
+  const posBucket=raw=>{
+    const s=String(raw||'').toUpperCase().replace(/[^A-Z/]/g,'').replace(/\/+$/,'');
+    if(!s) return null;
+    if(POSMAP[s]) return POSMAP[s];       // exact spelling, incl. combo guards like CG
+    if(/[FCW]/.test(s)) return 'F';       // any frontcourt or wing letter -> forward
+    if(/G/.test(s))     return 'G';
+    return null;};
+  /* rank 2 = jersey with a state code, 1 = the HIGHSCHOOL field, 0 = a bare
+     jersey at a school event. Later date always wins; rank only breaks ties. */
+  const schoolEvidence=(p,name,ym,rank)=>{
+    if(!name||NOT_A_SCHOOL.test(name)) return;
+    if(ym>p.hsYm || (ym===p.hsYm && rank>p.hsRank)){ p.hs=name; p.hsYm=ym; p.hsRank=rank; }
+  };
+  const modeRecent=(m)=>{ let best=null,bn=-1;
+    m.forEach((v,k)=>{ if(v.n>bn||(v.n===bn&&v.last>best.last)){bn=v.n;best={k,last:v.last};} });
+    return best?best.k:null; };
+  const bump=(m,k,ym)=>{ if(k==null||k===''||k===-1) return;
+    let v=m.get(k); if(!v){v={n:0,last:0};m.set(k,v);} v.n++; if(ym>v.last)v.last=ym; };
+
+  for(const i of order){
+    const r=find(i);
+    let pi=rootId.get(r);
+    if(pi===undefined){
+      pi=P.length; rootId.set(r,pi); rowsOf.push([]);
+      P.push({id:pi,n:R.raw[i],ctry:'US',lines:[],mC:new Map(),mP:new Map(),mL:new Map(),
+        hi:null,prog:null,hs:null,hsYm:-1,hsRank:-1,rec:0,unnamed:false,
+        st: splitRoot.has(r)?'review':(vetoRoot.has(r)?'veto':'clean')});
+    }
+    const p=P[pi], e=ev[R.e[i]];
+    p.n=R.raw[i];                                     // latest spelling wins
+    bump(p.mC,R.cls[i]>0?R.cls[i]:null,e.ym);
+    bump(p.mP,posBucket(R.pos[i]),e.ym);
+    bump(p.mL,R.loc[i]||null,e.ym);
+    /* School is the one he most recently played for. It is not a fixed attribute:
+       2,314 players carry more than one in the file, and taking the most frequent
+       value showed the school 1,080 of them had already LEFT, because the years
+       spent there had more rows to accumulate.
+
+       Both the HIGHSCHOOL field and the shirt he actually wore at a school event
+       count as evidence, and the later one wins. A jersey with a state code beats
+       a bare name from the same month, since that is the form a school takes. */
+    if(R.sch[i]) schoolEvidence(p,R.sch[i],e.ym,1);
+    if(R.ht[i]>0) p.hi=R.ht[i];                       // most recent measurement
+    const team=R.tm[i]>=0?tmS[R.tm[i]]:null;
+    if(team){
+      if(e.isHS) schoolEvidence(p,team,e.ym,STATE_TAIL.test(team)?2:0);
+      else p.prog=team;
+    }
+    rowsOf[pi].push(i);
+    if(R.ph[i]) p.unnamed=true;
+    p.lines.push({ei:R.e[i],tm:team||'',isHS:e.isHS,
+      g:R.g[i],min:R.min[i],pts:R.pts[i],reb:R.reb[i],ast:R.ast[i],stl:R.stl[i],
+      blk:R.blk[i],to:R.to[i],pf:R.pf[i],orb:R.orb[i],
+      fgm:R.fgm[i],fga:R.fga[i],twm:R.twm[i],twa:R.twa[i],
+      tpm:R.tpm[i],tpa:R.tpa[i],ftm:R.ftm[i],fta:R.fta[i],
+      usgn:R.usgn[i],usgd:R.usgd[i]});
+  }
+
+  /* ── collapse rows that describe the same player at the same event ──
+     462 rows in the source repeat verbatim — summing those would double the
+     player's totals, so identical rows are dropped. What is left is a genuine
+     second entry (two teams or two age divisions at one event) and IS summed. */
+  const SUM=['g','min','pts','reb','ast','stl','blk','to','pf','orb',
+             'fgm','fga','twm','twa','tpm','tpa','ftm','fta','usgn','usgd'];
+  let exactDup=0, merged=0;
+  P.forEach(p=>{
+    const seen=new Set(), byEv=new Map();
+    for(const l of p.lines){
+      const k=l.ei+'|'+l.tm+'|'+SUM.map(z=>l[z]).join(',');
+      if(seen.has(k)){exactDup++;continue;}
+      seen.add(k);
+      const cur=byEv.get(l.ei);
+      if(!cur){byEv.set(l.ei,l);continue;}
+      SUM.forEach(z=>cur[z]+=l[z]);
+      if(l.isHS&&!cur.isHS){cur.tm=l.tm;cur.isHS=true;}     // school label wins
+      merged++;
+    }
+    p.lines=[...byEv.values()];
+    p.rec=p.lines.length;
+    if(p.unnamed) p.st='unnamed';
+  });
+
+  /* ── career shape: a SOFT signal, and only that ───────────────────
+     The database is not all high-school basketball — club, camp and showcase
+     events sit alongside school seasons — so a season with no record proves
+     nothing on its own. A player may simply not have appeared at any event we
+     carry that year. It is worth a second look only when the records on either
+     side of the hole have nothing positive tying them together.
+
+     So the gap never overrides evidence. If a row before the gap and a row
+     after it share a date of birth, a team, or a teammate, the merge stands
+     untouched. Only when every gap is unsupported is the player flagged, and
+     even then nothing is split — the default-same-person prior holds.
+
+     Of the 210 players spanning more than four seasons with a hole, 9 are
+     bridged by evidence (4 by date of birth, 2 by team, 3 by a teammate) and
+     keep their status; 201 are not. */
+  const SEASON_CUT=9;
+  const seasonOfRow=i=>{const e=ev[R.e[i]]; return e.m>=SEASON_CUT?e.y+1:e.y;};
+  const confirms=(i,j)=>(R.dob[i]>=0&&R.dob[i]===R.dob[j]) || veto(i,j);
+  const lab=y=>`${String(y-1).slice(2)}-${String(y).slice(2)}`;
+
+  P.forEach((p,pi)=>{
+    if(p.unnamed) return;
+    const idxs=rowsOf[pi];
+    if(idxs.length<2) return;
+    const ys=[...new Set(idxs.map(seasonOfRow))].sort((a,b)=>a-b);
+    const span=ys[ys.length-1]-ys[0], missing=span+1-ys.length;
+    if(!(span>4&&missing>0)) return;
+    for(let k=1;k<ys.length;k++){
+      if(ys[k]-ys[k-1]<=1) continue;                       // not a gap
+      const before=idxs.filter(i=>seasonOfRow(i)<=ys[k-1]);
+      const after =idxs.filter(i=>seasonOfRow(i)>=ys[k]);
+      let bridged=false;
+      for(const a of before){ for(const b of after){ if(confirms(a,b)){bridged=true;break;} } if(bridged)break; }
+      if(!bridged){
+        p.st='review';
+        p.why=`Records run ${lab(ys[0])} to ${lab(ys[ys.length-1])} with `
+          +`${missing===1?'a season':missing+' seasons'} missing `
+          +`(${ys.map(lab).join(', ')}), and nothing links the rows either side of the `
+          +`${lab(ys[k-1])} to ${lab(ys[k])} hole — no shared date of birth, team or `
+          +`teammate. They may belong to more than one player.`;
+        break;
+      }
+    }
+  });
+  IMPORT.shape=P.filter(p=>p.why).length;
+
+  await say('Finishing '+P.length.toLocaleString()+' players', .90);
+  const evOut=ev.map((e,i)=>({id:'e'+i,r:e.b,n:e.n,d:`${e.y}-${String(e.m).padStart(2,'0')}-01`,
+    dl:MON3[e.m-1],loc:'',c:e.c,tm:0,field:0,nw:0,ps:[],_i:i}));
+  const teamSets=ev.map(()=>new Set());
+
+  P.forEach(p=>{
+    const cls=modeRecent(p.mC), pos=modeRecent(p.mP);
+    p.cls=cls?String(cls):''; p.posData=pos||''; p.pos=p.posData;
+    p.loc=modeRecent(p.mL)||''; p.hs=p.hs||'';
+    /* prog is the club/AAU side. A player who only ever appears at school events
+       has none, and that is the honest answer — the Team column reads the jersey
+       off each row and does not depend on this. */
+    p.prog=p.prog||'';
+    p.ht=p.hi?`${Math.floor(p.hi/12)}'${p.hi%12}`:'';
+    p.mC=p.mP=p.mL=null;
+    p.lines.sort((a,b)=>ev[a.ei].ym-ev[b.ei].ym);
+    p.lines.forEach(l=>{ evOut[l.ei].ps.push(p.id); if(l.tm) teamSets[l.ei].add(l.tm); });
+  });
+  evOut.forEach((e,i)=>{ e.tm=teamSets[i].size; e.field=e.ps.length; });
+
+  // "new to database" = first time this player appears anywhere
+  P.forEach(p=>{ if(p.lines.length) evOut[p.lines[0].ei].nw++; });
+
+  IMPORT.active=true; IMPORT.file=file.name; IMPORT.rows=N; IMPORT.dropped=bad;
+  IMPORT.exactDup=exactDup; IMPORT.merged=merged;
+  IMPORT.unnamed=P.filter(p=>p.unnamed).length;
+  IMPORT.players=P.length; IMPORT.events=evOut.length;
+  IMPORT.ms=Math.round(performance.now()-t0);
+  return {players:P,events:evOut};
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   DATA LAYER — one shape for both prototype and imported data
+   ═══════════════════════════════════════════════════════════════ */
+
+/* prototype-only per-event line generator. Emits TOTALS. */
+function hash(s){let h=0;for(let i=0;i<s.length;i++)h=(h*31+s.charCodeAt(i))|0;return Math.abs(h);}
+const COUNTRY={US:'USA',RS:'Serbia',PT:'Portugal',SN:'Senegal',FI:'Finland',
+               AR:'Argentina',JP:'Japan',DE:'Germany',NG:'Nigeria'};
+const HS_EVENT=new Set(['HS Showcase','HS National','HS State']);
+const SELECT_EVENT=new Set(['FIBA','All-Star']);
+function demoTeam(e,p){
+  if(HS_EVENT.has(e.c)) return (p.hs&&p.hs!=='—')?p.hs:p.prog;
+  if(e.c==='FIBA'){const m=e.n.match(/U1\d/); return (COUNTRY[p.ctry]||p.ctry)+(m?' '+m[0]:'');}
+  if(e.c==='All-Star') return p.ctry==='US'?'USA Team':'World Team';
+  return p.prog;
+}
+function demoLine(e,p){
+  const s=hash(e.id+'|'+p.id), j=k=>(((s>>(k*3))%13)-6)/10;
+  const yr=new Date(e.d+'T00:00:00').getMonth()>=8?new Date(e.d).getFullYear()+1:new Date(e.d).getFullYear();
+  const grow=1-Math.max(0,(2026-yr))*0.11;
+  const g=3+(s%4), mpg=Math.max(13,Math.min(33,22+(s%12)-3));
+  const tot=(v,k)=>Math.max(0,v*(1+j(k)*.3)*grow*g);
+  const fga=Math.round((8+(s%9))*g*grow);
+  const tpa=p.tp==null?0:Math.round(fga*.34*(1+j(6)*.3));
+  const fta=Math.round(fga*.32*(1+j(7)*.3));
+  return {g, min:Math.round(mpg*g),
+    pts:Math.round(tot(p.ppg,1)), reb:Math.round(tot(p.rpg,2)), ast:Math.round(tot(p.apg,3)),
+    orb:Math.round(tot(p.rpg,2)*(.25+j(4)*.2)),
+    stl:Math.round(tot(.6+(s%9)/8,4)), blk:Math.round(tot(Math.max(.1,(p.hi-71)/22),5)),
+    to:Math.round(tot(1.8+(s%7)/5,8)), pf:Math.round(tot(1.9+(s%5)/4,9)),
+    fgm:Math.round(fga*(.40+j(2)*.10)), fga,
+    twa:fga-tpa, twm:Math.round((fga-tpa)*(.47+j(3)*.10)),
+    tpa, tpm:Math.round(tpa*(p.tp??.33)),
+    fta, ftm:Math.round(fta*(p.ft??.72)),
+    /* prototype only — a plausible usage share so the chart has a shape */
+    usgn:fga+.44*fta+Math.round(tot(1.8+(s%7)/5,8)),
+    usgd:(fga+.44*fta+Math.round(tot(1.8+(s%7)/5,8)))/(0.16+(s%14)/80)};
+}
+
+let EIDX=new Map(), PIDX=new Map();
+const BOARD={usa:[],intl:[],saved:[]};
+let nUnnamed=0;
+const BUCKETS=new Map();          // peer pools, keyed by position / position+class
+const PEER=new Map();
+
+/* ── manual position entry ───────────────────────────────────────
+   Position is blank for ~43% of resolved players because the source
+   never lists one. A scout can type it in; the value is marked as
+   hand-entered, survives reloads, and immediately moves the player
+   into the matching peer pool for the trend and percentile charts.
+   Keyed by name+class+hometown so it survives a re-import, and
+   exportable as JSON in case storage is blocked on file:// URLs. */
+const PFIX_KEY='fau.posfix.v1';
+let POSFIX=new Map();
+const pkeyOf=p=>[p.n.toLowerCase().replace(/[^a-z ]/g,'').replace(/\s+/g,' ').trim(),
+                 p.cls||'', (p.loc||'').toLowerCase()].join('|');
+function pfixLoad(){
+  try{POSFIX=new Map(Object.entries(JSON.parse(localStorage.getItem(PFIX_KEY)||'{}')));}
+  catch(e){POSFIX=new Map();}
+  POSFIX.forEach((v,k)=>{const n=narrowPos(v); n?POSFIX.set(k,n):POSFIX.delete(k);});
+}
+function pfixSave(){
+  try{localStorage.setItem(PFIX_KEY,JSON.stringify(Object.fromEntries(POSFIX)));return true;}
+  catch(e){return false;}          // file:// can block storage — export is the fallback
+}
+function applyPosFix(p){
+  const v=narrowPos(POSFIX.get(p.key));
+  p.posManual=!!v && v!==p.posData;
+  p.pos=v||p.posData||'';
+}
+function setPos(p,v){
+  if(!v||v===p.posData) POSFIX.delete(p.key); else POSFIX.set(p.key,v);
+  applyPosFix(p); pfixSave(); rebuildBuckets(); paintSource(); render();
+}
+function rebuildBuckets(){
+  BUCKETS.clear(); PEER.clear(); PEERAGG.clear(); RPOOL.clear();
+  PLAYERS.forEach(p=>{
+    if(p.unnamed) return;                    // a shirt number is not a peer
+    const b=posOf(p);
+    for(const k of [b,b+'|'+p.cls]){let a=BUCKETS.get(k);if(!a){a=[];BUCKETS.set(k,a);}a.push(p);}});
+}
+
+function reindex(){
+  EIDX=new Map(); EVENTS.forEach(e=>EIDX.set(e.id,e));
+  PIDX=new Map(); PLAYERS.forEach(p=>PIDX.set(p.id,p));
+  EVENTS.forEach(e=>e.rows=[]);
+
+  if(!IMPORT.active){                       // synthesise lines for the prototype set
+    PLAYERS.forEach(p=>{p.lines=[];});
+    EVENTS.forEach(e=>e.ps.forEach(id=>{
+      const p=PIDX.get(id); if(!p) return;
+      const l=demoLine(e,p);
+      l.e=e; l.tm=demoTeam(e,p); l.isHS=HS_EVENT.has(e.c); l.isSel=SELECT_EVENT.has(e.c);
+      p.lines.push(l);
+    }));
+    PLAYERS.forEach(p=>p.lines.sort((a,b)=>a.e.d.localeCompare(b.e.d)));
+  }else{
+    PLAYERS.forEach(p=>p.lines.forEach(l=>{l.e=EVENTS[l.ei];l.isSel=false;}));
+  }
+
+  PLAYERS.forEach(p=>{
+    p.bm=0; p._sa=null;
+    const t={},qt={}; SUMKEYS.forEach(k=>{t[k]=0;qt[k]=0;});
+    p.lines.forEach(l=>{const ok=l.min>0;
+      SUMKEYS.forEach(k=>{const v=l[k]||0; t[k]+=v; if(ok) qt[k]+=v;});});
+    t.q=qt; p.tot=t; p.rec=p.lines.length;
+
+    p.posData=narrowPos(p.posData===undefined?p.pos:p.posData);
+    p.key=pkeyOf(p); applyPosFix(p);
+    p.lines.forEach(l=>{ p.bm|=(l.e.r==='intl'?2:1); l.e.rows.push({p,s:l}); });
+    /* every team he actually wore is searchable, not just the club side —
+       38,571 players appear only at school events and have no club at all */
+    const tms=new Set(); p.lines.forEach(l=>{if(l.tm)tms.add(l.tm);});
+    p.q=(p.n+' '+(p.loc||'')+' '+(p.hs||'')+' '+[...tms].join(' ')).toLowerCase();
+  });
+  rebuildBuckets();
+  nUnnamed=PLAYERS.reduce((n,p)=>n+(p.unnamed?1:0),0);
+  BOARD.usa=PLAYERS.filter(p=>p.bm&1);
+  BOARD.intl=PLAYERS.filter(p=>p.bm&2);
+}
+
+/* ── state ─────────────────────────────── */
+let savedP=new Set(IMPORT.active?[]:[1,20]);
+let view='usa', mode='players', q='';
+let sortBoard='pts', sortRoster='pts';
+const F={cls:new Set(),pos:new Set(),circ:new Set()};
+let hideUnnamed=true;      /* placeholder rows would otherwise top every stat sort */
+const RF={pos:new Set()};
+let stack=[{t:'board'}];
+let page=1, pageSize=100, lastPages=1, lastSig='';
+let per='g';                 /* 'g' = Per G, '40' = Per 40 — shared by all levels */
+
+const here=()=>stack[stack.length-1];
+const $=s=>document.querySelector(s);
+const P=id=>PIDX.get(typeof id==='string'?+id:id);
+const E=id=>EIDX.get(id);
+const VIEWNAME={usa:'USA',intl:'International',saved:'Saved'};
+
+const esc=v=>String(v??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const num=(v,d=1)=>(v==null||Number.isNaN(v))?'—':Number(v).toFixed(d);
+const rate=v=>(v==null||Number.isNaN(v))?'—':(v>=1?Number(v).toFixed(2):Number(v).toFixed(3).slice(1));
+
+function setQ(v){q=v;const el=$('#q');if(el)el.value=v;}
+function go(node){stack.push(node);setQ('');if(node.t==='player'){DT.open=null;DT.radarY=null;}render();}
+function back(){if(stack.length>1){stack.pop();setQ('');render();}}
+function toBoard(m){stack=[{t:'board'}];if(m)mode=m;setQ('');render();}
+
+
+/* ── team resolution ───────────────────────────────────────────
+   Team is a property of the player-event row, not of the player.
+   Affiliation priority: high school > club / AAU > one-off selection.
+   ───────────────────────────────────────────────────────────── */
+function affiliation(p){
+  const ls=p.lines.slice().reverse();                   // newest first
+  const hs  = ls.find(l=>l.isHS&&l.tm) || null;
+  const club= ls.find(l=>!l.isHS&&!l.isSel&&l.tm) || null;
+  const sel = ls.find(l=>l.isSel&&l.tm) || null;
+  const primary = hs||club||sel||null;
+  return {primary, secondary:(hs&&club)?club:null, club, selectionOnly:!hs&&!club&&!!sel};
+}
+const teamCell=p=>{
+  const a=affiliation(p);
+  if(!a.primary) return `<td><span class="blank">—</span></td>`;
+  const src=`From ${a.primary.e.n}, ${a.primary.e.d.slice(0,4)}`;
+  return `<td title="${esc(src)}"><div>${esc(a.primary.tm)}</div>`
+    +(a.secondary?`<div class="esub">${esc(a.secondary.tm)}</div>`
+                 :(a.selectionOnly?`<div class="esub">Selection team only</div>`:''))
+    +`</td>`;};
+
+function onBoard(v){
+  if(v==='saved') return PLAYERS.filter(p=>savedP.has(p.id));
+  return BOARD[v]||[];
+}
+const eventsOnBoard=v=>EVENTS.filter(e=>e.r===v);
+
+/* ── selectors ─────────────────────────── */
+function boardPlayers(){
+  let l=onBoard(view)
+    .filter(p=>!(hideUnnamed&&p.unnamed))
+    .filter(p=>!F.cls.size||F.cls.has(p.cls))
+    .filter(p=>!F.pos.size||F.pos.has(p.pos))
+    .filter(p=>!q||p.q.includes(q));
+  const k=sortBoard, c=COL(k);
+  if(c) return l.map(p=>({p,v:val(p.tot,c,per)}))
+                .sort((x,y)=>(y.v??-1)-(x.v??-1)).map(x=>x.p);
+  l.sort((a,b)=>k==='n'?a.n.localeCompare(b.n)
+    :k==='cls'?String(a.cls||'9999').localeCompare(String(b.cls||'9999'))
+    :k==='hi'?(b.hi??0)-(a.hi??0)
+    :k==='rec'?b.rec-a.rec
+    :(b.tot[k]??-1)-(a.tot[k]??-1));
+  return l;
+}
+function boardEvents(){
+  return eventsOnBoard(view)
+    .filter(e=>!F.circ.size||F.circ.has(e.c))
+    .filter(e=>!q||(e.n+' '+e.loc+' '+e.c).toLowerCase().includes(q))
+    .sort((a,b)=>b.d.localeCompare(a.d));
+}
+function rosterRows(e){
+  let l=e.rows
+    .filter(x=>!(hideUnnamed&&x.p.unnamed))
+    .filter(x=>!RF.pos.size||RF.pos.has(x.p.pos))
+    .filter(x=>!q||(x.p.n+' '+(x.s.tm||'')).toLowerCase().includes(q));
+  const k=sortRoster, c=COL(k);
+  if(c) return l.map(x=>({x,v:val(x.s,c,per)}))
+                .sort((a,b)=>(b.v??-1)-(a.v??-1)).map(o=>o.x);
+  return l.slice().sort((a,b)=>k==='n'?a.p.n.localeCompare(b.p.n)
+    :k==='cls'?String(a.p.cls||'9999').localeCompare(String(b.p.cls||'9999'))
+    :k==='hi'?(b.p.hi??0)-(a.p.hi??0)
+    :(b.s[k]??-1)-(a.s[k]??-1));
+}
+
+/* ── pagination ────────────────────────────────────────────────
+   Page resets to 1 whenever the underlying list changes — a new board,
+   mode, filter, sort or search — but never when only the page changes. */
+function listSig(){const n=here();
+  return [n.t,n.id||'',view,mode,q,sortBoard,sortRoster,hideUnnamed,per,
+    view==='saved'?savedP.size:'',
+    [...F.cls].sort().join(),[...F.pos].sort().join(),
+    [...F.circ].sort().join(),[...RF.pos].sort().join()].join('|');}
+
+function pageNums(cur,tot){
+  const s=new Set([1,tot,cur,cur-1,cur+1]);
+  if(cur<=3)[2,3,4].forEach(n=>s.add(n));
+  if(cur>=tot-2)[tot-1,tot-2,tot-3].forEach(n=>s.add(n));
+  const l=[...s].filter(n=>n>=1&&n<=tot).sort((a,b)=>a-b);
+  const out=[]; let prev=0;
+  for(const n of l){ if(n-prev>1) out.push('…'); out.push(n); prev=n; }
+  return out;}
+
+function paginate(list,unit){
+  const tot=Math.max(1,Math.ceil(list.length/pageSize));
+  if(page>tot) page=tot;
+  lastPages=tot;
+  const from=list.length?(page-1)*pageSize+1:0, to=Math.min(list.length,page*pageSize);
+  const nums=tot>1?pageNums(page,tot).map(n=>n==='…'?`<span class="pgdots">…</span>`
+    :`<button class="pgn${n===page?' on':''}" data-pg="${n}">${n}</button>`).join(''):'';
+  const html=`<nav class="pager" aria-label="Pagination">
+    <span class="pginfo">Showing <b>${from.toLocaleString()}–${to.toLocaleString()}</b>
+      of <b>${list.length.toLocaleString()}</b> ${esc(unit)}</span>
+    ${tot>1?`<div class="pgctl">
+      <button data-pg="prev"${page===1?' disabled':''} aria-label="Previous page">‹</button>
+      ${nums}
+      <button data-pg="next"${page===tot?' disabled':''} aria-label="Next page">›</button>
+      </div>`:''}
+    <label class="pgsize">Rows <select id="pgsize">${[50,100,250,500].map(n=>
+      `<option value="${n}"${n===pageSize?' selected':''}>${n}</option>`).join('')}</select></label>
+  </nav>`;
+  return {shown:list.slice((page-1)*pageSize,page*pageSize), html};}
+
+/* ── fragments ─────────────────────────── */
+function ticks(p){const n=Math.min(p.rec,14);let h='';
+  for(let i=0;i<n;i++){const c=p.st==='review'&&i>=n-2?'flag':(p.st==='veto'&&i>=n-2?'ghost':'');
+    h+=`<i class="${c}" style="height:${58+((i*29)%42)}%"></i>`;}return h;}
+const star=(id,on,label)=>`<button class="star" data-id="${id}" aria-pressed="${on}" aria-label="Save ${esc(label)}">
+  <svg viewBox="0 0 24 24" stroke="currentColor"><path d="M6 3h12v18l-6-4.6L6 21z"/></svg></button>`;
+const chips=(vals,set)=>vals.map(v=>`<button class="chip" data-v="${esc(v)}" aria-pressed="${set.has(v)}">${esc(v)}</button>`).join('');
+const sortSel=(opts,cur)=>`<div class="sortwrap"><span class="provisional">Provisional</span>
+  <span class="fgroup-label">Sort</span><select id="sort">
+  ${opts.map(([k,l])=>`<option value="${k}"${k===cur?' selected':''}>${esc(l)}</option>`).join('')}</select></div>`;
+const perToggle=()=>`<div class="seg2 perseg" data-group="per">
+  <button data-per="g" aria-pressed="${per==='g'}">Per G</button>
+  <button data-per="40" aria-pressed="${per==='40'}">Per 40</button></div>`;
+/* header cells for the eleven stat columns */
+const colHead=()=>COLS.map(c=>`<th class="num"${c.a
+  ? ` title="${esc(c.m.toUpperCase())} / ${esc(c.a.toUpperCase())} — makes over attempts, identical under Per G and Per 40"`
+  : ''}>${esc(colLabel(c,per))}</th>`).join('');
+const colCells=a=>COLS.map(c=>{const v=val(a,c,per);
+  return `<td class="num">${c.a?rate(v):num(v)}</td>`;}).join('');
+const away=p=>(p.bm&2)?' <span class="awaytag" title="Also played an event outside the US">Abroad</span>':'';
+const POSOPTS=['G','F'];
+const POS_NARROW={G:'G',F:'F',W:'F',C:'F'};      // wings and centres fold into F
+const narrowPos=v=>v?(POS_NARROW[v]||''):'';
+const posCell=p=>`<td class="pos">
+  <select class="posedit${p.posManual?' manual':(p.pos?'':' none')}" data-pos-for="${p.id}"
+    title="${p.posManual?'Set by hand':(p.pos?'From event records':'Not listed in any record — set it here')}"
+    aria-label="Position for ${esc(p.n)}">
+    <option value=""${p.pos?'':' selected'}>—</option>
+    ${POSOPTS.map(o=>`<option value="${o}"${p.pos===o?' selected':''}>${o}</option>`).join('')}
+  </select>${p.posManual?'<i class="posdot" title="Set by hand"></i>':''}</td>`;
+
+/* ── chrome ────────────────────────────── */
+function renderCrumb(){
+  const node=here(); let h=`<button data-jump="board">${VIEWNAME[view]}</button>`;
+  if(node.t==='board'&&view!=='saved') h+=` <i>/</i> <em>${mode==='players'?'Players':'Events'}</em>`;
+  if(node.t==='event') h+=` <i>/</i> <button data-jump="events">Events</button> <i>/</i> <em>${esc(E(node.id).n)}</em>`;
+  if(node.t==='player'){
+    const from=stack[stack.length-2];
+    h += (from&&from.t==='event')
+      ? ` <i>/</i> <button data-jump="events">Events</button> <i>/</i> <button data-jump="back">${esc(E(from.id).n)}</button>`
+      : (view==='saved'?'':` <i>/</i> <button data-jump="players">Players</button>`);
+    h+=` <i>/</i> <em>${esc(P(node.id).n)}</em>`;
+  }
+  $('#crumb').innerHTML=h;
+  $('#back').hidden=stack.length<2;
+}
+
+/* class chips come from the data, not a hard-coded list */
+function classesOnBoard(){
+  const c=new Map();
+  onBoard(view).forEach(p=>{if(p.cls)c.set(p.cls,(c.get(p.cls)||0)+1);});
+  return [...c.entries()].sort((a,b)=>b[1]-a[1]).slice(0,8).map(x=>x[0]).sort();
+}
+
+function renderFilters(){
+  const f=$('#filters'), node=here();
+  if(node.t==='player'){f.innerHTML='';f.style.padding='0';return;}
+  f.style.padding='';
+  if(node.t==='event'){
+    f.innerHTML=`<span class="fgroup-label">Position</span>
+      <div class="fgroup" data-set="rpos">${chips(POSOPTS,RF.pos)}</div>
+      ${perToggle()}${sortSel(SORT_ROSTER(),sortRoster)}`;
+    $('#sort').onchange=ev=>{sortRoster=ev.target.value;render();};
+  }else if(mode==='players'){
+    const cls=classesOnBoard();
+    [...F.cls].forEach(v=>{if(!cls.includes(v))F.cls.delete(v);});
+    const un=nUnnamed;
+    f.innerHTML=`<span class="fgroup-label">Class</span><div class="fgroup" data-set="cls">${chips(cls,F.cls)}</div>
+      <span class="fdivider"></span>
+      <span class="fgroup-label">Position</span><div class="fgroup" data-set="pos">${chips(POSOPTS,F.pos)}</div>
+      ${un?`<span class="fdivider"></span>
+      <div class="fgroup" data-set="un"><button class="chip" data-v="un" aria-pressed="${hideUnnamed}"
+        title="Rows where the source gives a team and shirt number instead of a name">
+        Hide unnamed (${un.toLocaleString()})</button></div>`:''}
+      ${perToggle()}${sortSel(SORT_BOARD(),sortBoard)}`;
+    $('#sort').onchange=ev=>{sortBoard=ev.target.value;render();};
+  }else{
+    const avail=[...new Set(eventsOnBoard(view).map(e=>e.c))].sort();
+    [...F.circ].forEach(v=>{if(!avail.includes(v))F.circ.delete(v);});
+    f.innerHTML=`<span class="fgroup-label">Circuit</span>
+      <div class="fgroup" data-set="circ">${chips(avail,F.circ)}</div>`;
+  }
+}
+
+function render(){
+  const node=here();
+  const s=listSig(); if(s!==lastSig){lastSig=s; page=1;}
+  /* No per-board counts in the sidebar. The boards are not exclusive — a player
+     who competes on US soil and abroad sits on both — so the two numbers never
+     summed to the distinct total, they ignored every active filter, and Saved
+     counted a different unit again. The pager's "of N" is the honest number. */
+
+  $('#modebar').hidden=node.t!=='board'||view==='saved';
+  $('#searchbox').hidden=node.t==='player';
+  [...document.querySelectorAll('#seg button')].forEach(b=>b.setAttribute('aria-pressed',b.dataset.mode===mode));
+  renderCrumb(); renderFilters();
+
+  if(node.t==='board')  return mode==='players'?viewBoardPlayers():viewBoardEvents();
+  if(node.t==='event')  return viewEventRoster(E(node.id));
+  if(node.t==='player') return viewPlayer(P(node.id));
+}
+
+/* ── L1 · players (career) ─────────────── */
+function viewBoardPlayers(){
+  const list=boardPlayers(), total=onBoard(view).length;
+  $('#title').textContent=VIEWNAME[view];
+  $('#scope').hidden=false; $('#scope').textContent='All events';
+  $('#note').textContent=`${list.length.toLocaleString()} players · career, ${per==='40'?'per 40 minutes':'per game'}`;
+  $('#q').placeholder='Search players, programs, hometowns';
+  $('#modehint').textContent='Sorting is provisional — pick the ranking rule later';
+
+  if(!list.length){
+    if(!total) return empty(view==='saved'?'Nothing saved yet':'No players on this board',
+      view==='saved'?'Star a player from USA or International to keep them here.'
+                    :'No event on this board has any player records yet.');
+    return empty('No players match',
+      `${total.toLocaleString()} player${total>1?'s':''} on this board are hidden by the current filters or search.`);
+  }
+
+  const {shown,html:pg}=paginate(list,'players');
+
+  $('#out').innerHTML=`<table><thead><tr>
+    <th></th><th>Player</th><th>Class</th>
+    <th title="Two pools only — G is PG/SG/G, F is everything from the wing up. Click to set a blank one.">Pos</th><th>Ht</th>
+    <th>Hometown</th><th title="High school first, then club or AAU program">Team</th>
+    <th class="num">Ev</th><th class="num">GP</th>${colHead()}<th>Identity</th>
+  </tr></thead><tbody>${shown.map(p=>`<tr class="prow">
+    <td>${star(p.id,savedP.has(p.id),p.n)}</td>
+    <td><button class="plink" data-player="${p.id}">${esc(p.n)}</button></td>
+    <td class="mono">${p.cls?esc(p.cls):'<span class="blank">—</span>'}</td>
+    ${posCell(p)}
+    <td class="mono">${p.ht?esc(p.ht):'<span class="blank">—</span>'}</td>
+    <td>${p.loc?esc(p.loc):'<span class="blank">—</span>'}${away(p)}</td>${teamCell(p)}
+    <td class="num">${p.rec}</td><td class="num">${p.tot.g}</td>${colCells(p.tot)}
+    <td><div class="ident" tabindex="0"><span class="ticks">${ticks(p)}</span>
+      <span class="ident-n">${p.rec}</span><span class="ident-tag ${p.st}">${IDENT[p.st].tag}</span>
+      <span class="tip"><b>${IDENT[p.st].tag} · ${p.rec} records</b>${esc(p.why||IDENT[p.st].txt)}</span></div></td>
+  </tr>`).join('')}</tbody></table>${pg}`;
+}
+
+/* ── L1 · events ───────────────────────── */
+function viewBoardEvents(){
+  const list=boardEvents(), total=eventsOnBoard(view).length;
+  $('#title').textContent=VIEWNAME[view];
+  $('#scope').hidden=true;
+  $('#note').textContent=`${list.length.toLocaleString()} events`;
+  $('#q').placeholder='Search events, venues, circuits';
+  $('#modehint').textContent='Newest first';
+
+  if(!list.length){
+    if(!total) return empty('No events on this board','This board has no events yet.');
+    return empty('No events match',
+      `${total.toLocaleString()} event${total>1?'s':''} on this board are hidden by the current filters or search.`);
+  }
+
+  /* Venue is not a column in this export, so board is inferred from the event
+     name via INTL_RX. The current source is US-only by design; the International
+     board fills in when that feed is added. */
+  const {shown,html:pg}=paginate(list,'events');
+
+  let body='',last='';
+  shown.forEach(e=>{
+    const dt=new Date(e.d+'T00:00:00'), key=dt.getFullYear()+'-'+dt.getMonth();
+    if(key!==last){last=key;body+=`<tr class="month"><td colspan="7">${MON[dt.getMonth()]} ${dt.getFullYear()}</td></tr>`;}
+    body+=`<tr class="erow" data-event="${e.id}" tabindex="0" aria-label="Open ${esc(e.n)}">
+      <td><div class="ename">${esc(e.n)}</div><div class="esub">${esc(e.c)}</div></td>
+      <td class="mono">${esc(e.dl)}</td><td>${e.loc?esc(e.loc):'<span class="blank">—</span>'}</td>
+      <td class="num">${e.tm}</td><td class="num">${e.ps.length}</td>
+      <td class="num"><span class="new-n">${e.nw}</span></td>
+      <td class="num" style="color:var(--slate-light)">→</td></tr>`;
+  });
+  $('#out').innerHTML=`<table><thead><tr><th>Event</th><th>Month</th><th>Venue</th>
+    <th class="num">Teams</th><th class="num">In database</th><th class="num">New</th><th></th>
+    </tr></thead><tbody>${body}</tbody></table>${pg}`;
+}
+
+/* ── L2 · event roster (this event only) ─ */
+function viewEventRoster(e){
+  const list=rosterRows(e);
+  $('#title').textContent=e.n;
+  $('#scope').hidden=false; $('#scope').textContent='This event only';
+  $('#note').textContent=`${list.length.toLocaleString()} of ${e.rows.length.toLocaleString()} players`;
+  $('#q').placeholder='Search this roster';
+
+  const bar=`<dl class="evbar">
+    <div><dt>${IMPORT.active?'Month':'Dates'}</dt><dd>${esc(e.dl)}, ${e.d.slice(0,4)}</dd></div>
+    <div><dt>Venue</dt><dd>${e.loc?esc(e.loc):'<span class="blank">—</span>'}</dd></div>
+    <div><dt>Circuit</dt><dd>${esc(e.c)}</dd></div>
+    <div><dt>Teams</dt><dd>${e.tm}</dd></div>
+    <div><dt>In database</dt><dd>${e.rows.length}</dd></div>
+    ${IMPORT.active?'':`<div><dt>Field size</dt><dd style="color:var(--slate)">${e.field}</dd></div>`}
+    <div><dt>New to database</dt><dd style="color:var(--blue)">${e.nw}</dd></div></dl>`;
+
+  if(!list.length){
+    $('#out').innerHTML=bar+`<div class="empty"><h3>No players match</h3>
+      <p>${e.rows.length} player${e.rows.length>1?'s':''} in this roster are hidden by the position filter or search.</p></div>`;
+    return;
+  }
+
+  const {shown,html:pg}=paginate(list,'players');
+  $('#out').innerHTML=bar+`<table><thead><tr>
+    <th></th><th>Player</th><th>Class</th><th>Pos</th><th>Ht</th><th>Team at event</th>
+    <th class="num">GP</th><th class="num">MIN</th>${colHead()}<th></th>
+  </tr></thead><tbody>${shown.map(r=>`<tr class="prow">
+    <td>${star(r.p.id,savedP.has(r.p.id),r.p.n)}</td>
+    <td><button class="plink" data-player="${r.p.id}">${esc(r.p.n)}</button>${away(r.p)}</td>
+    <td class="mono">${r.p.cls?esc(r.p.cls):'<span class="blank">—</span>'}</td>
+    ${posCell(r.p)}
+    <td class="mono">${r.p.ht?esc(r.p.ht):'<span class="blank">—</span>'}</td>
+    <td>${r.s.tm?esc(r.s.tm):'<span class="blank">—</span>'}</td>
+    <td class="num">${r.s.g}</td><td class="num">${Math.round(r.s.min)}</td>${colCells(r.s)}
+    <td class="flagcell">${r.p.st==='review'?'Review':''}</td>
+  </tr>`).join('')}</tbody></table>${pg}`;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   PLAYER DETAIL — season aggregation, peer comparison, charts
+   ═══════════════════════════════════════════════════════════════ */
+
+/* Season runs Sept 1 → Aug 31 and is named for the ending year.
+   2025-12-11 → season 2026.   2025-08-10 → season 2025. */
+const SEASON_CUTOVER_MONTH=8;
+function seasonOf(d){const dt=new Date(d+'T00:00:00');
+  return dt.getMonth()>=SEASON_CUTOVER_MONTH?dt.getFullYear()+1:dt.getFullYear();}
+const seasonLabel=y=>`${String(y-1).slice(2)}-${String(y).slice(2)}`;
+
+/* Two pools, nothing finer. Anything the data or an older save still spells as
+   a wing or a centre is narrowed on the way in — see POS_NARROW. */
+const BUCKET={G:'Guard',F:'Forward'};
+const posOf=p=>BUCKET[p.pos]||'Unlisted';
+
+/* Season aggregate = sum of totals, divided once. Never an average of averages.
+   SUMKEYS lives with COLS at the top of the file. */
+function seasons(p){
+  if(p._sa) return p._sa;
+  const m=new Map();
+  p.lines.forEach(l=>{
+    const y=seasonOf(l.e.d);
+    if(!m.has(y)) m.set(y,Object.assign({y,ev:[],hi:p.hi||null,q:Object.fromEntries(SUMKEYS.map(k=>[k,0]))},
+                                        Object.fromEntries(SUMKEYS.map(k=>[k,0]))));
+    const a=m.get(y); a.ev.push({e:l.e,s:l});
+    const ok=l.min>0;
+    SUMKEYS.forEach(k=>{a[k]+=(l[k]||0); if(ok) a.q[k]+=(l[k]||0);});
+  });
+  m.forEach(a=>a.ev.sort((x,z)=>z.e.d.localeCompare(x.e.d)));
+  const out=[...m.values()].sort((a,b)=>b.y-a.y);
+  p._sa=out; return out;
+}
+const seasonFor=(p,y)=>seasons(p).find(a=>a.y===y)||null;
+
+/* TODO PROVISIONAL. Minimum qualified minutes before a Per 40 figure is shown at
+   all. At 0 the leaderboard is topped by a player with 51 points in 0.1 minutes.
+   Measured effect on career Pts/40 across 85,266 named players:
+       floor   players kept   highest Pts/40
+           0        85,266    1200  (0.1 min)
+           5        72,650      94  (15 min)
+          20        56,641      58  (30 min)
+          40        39,780      53  (47 min)
+          80        23,994      50  (97 min)
+   Set this to whatever a scout should be allowed to see. */
+const MIN40_FLOOR=5;
+
+function val(a,c,pr){
+  if(!a||!c) return null;
+  if(c.f) return c.f(a);                           // ratio built from summed totals
+  if(c.a) return a[c.a]?a[c.m]/a[c.a]:null;        // percentage — same either mode
+  if(pr==='40'){
+    /* 4.5% of rows record points but no minutes. Counting those points over a
+       denominator they contributed nothing to is simply wrong arithmetic, so
+       Per 40 runs on the qualified subtotal — the lines that do have minutes.
+       A single event line has no subtotal and is its own. */
+    const s=a.q||a;
+    return s.min>MIN40_FLOOR?s[c.k]/s.min*40:null;
+  }
+  return a.g?a[c.k]/a.g:null;
+}
+const COL=k=>COLS.find(c=>c.k===k);
+
+/* Peer pools are bucketed once at index time, then cached per season. */
+function peerSeasons(p,scope,y){
+  const key=posOf(p)+'|'+(scope==='class'?p.cls:'*')+'|'+y;
+  let a=PEER.get(key);
+  if(!a){
+    const pool=BUCKETS.get(scope==='class'?posOf(p)+'|'+p.cls:posOf(p))||[];
+    a=[]; for(const o of pool){const s=seasonFor(o,y); if(s)a.push(s);}
+    PEER.set(key,a);
+  }
+  return a;
+}
+/* The comparison line pools the peer group and divides once — exactly what the
+   solid line does for one player, just over the whole pool.
+
+   It used to average each peer's own ratio, which is wrong here. 2,781 guard
+   seasons attempted between one and four threes; every 0-for-2 entered that
+   average as .000 and every 1-for-1 as 1.000, and the misses outweighed the
+   makes. Measured on 9,965 guards in season 2025:
+
+                    mean of ratios   pooled   mean above 20 attempts
+        3PT%             27.2         31.4          31.9
+        eFG%             43.6         47.7          47.4
+        TS%              46.4         50.9          50.3
+
+   Pooling lands where a volume floor would land, without inventing the floor.
+   The player is subtracted from the pool so he is not compared with himself. */
+const PEERAGG=new Map();
+function peerPool(p,scope,y){
+  const key=posOf(p)+'|'+(scope==='class'?p.cls:'*')+'|'+y;
+  let a=PEERAGG.get(key);
+  if(!a){
+    a={n:0,q:{}}; SUMKEYS.forEach(k=>{a[k]=0;a.q[k]=0;});
+    for(const s of peerSeasons(p,scope,y)){
+      a.n++; SUMKEYS.forEach(k=>{a[k]+=s[k]; a.q[k]+=(s.q?s.q[k]:0);});
+    }
+    PEERAGG.set(key,a);
+  }
+  return a;
+}
+function peerCount(p,scope,y){
+  const b=peerPool(p,scope,y);
+  return Math.max(0,b.n-(seasonFor(p,y)?1:0));
+}
+function peerMean(p,scope,y,c,pr){
+  const base=peerPool(p,scope,y), mine=seasonFor(p,y);
+  if(base.n-(mine?1:0)<1) return null;
+  const adj={q:{}};
+  SUMKEYS.forEach(k=>{adj[k]=base[k]-(mine?mine[k]:0);
+    adj.q[k]=base.q[k]-(mine&&mine.q?mine.q[k]:0);});
+  return val(adj,c,pr);
+}
+
+/* ── radar: percentile inside the peer pool ───────────────────────
+   Two passes. First every component is scored for the whole pool and
+   sorted, so a raw value can be turned into a rank. Then each peer's
+   axis blend is scored and sorted, so the blend itself can be ranked.
+   Both are cached per pool and season — the work is done once. */
+const RPOOL=new Map();
+const pctOf=(sorted,v)=>{                       /* midrank, ties share a value */
+  if(v==null||!sorted.length) return null;
+  let lo=0,hi=sorted.length;
+  while(lo<hi){const m=(lo+hi)>>1; if(sorted[m]<v)lo=m+1; else hi=m;}
+  let eq=lo; while(eq<sorted.length&&sorted[eq]===v) eq++;
+  return (lo+eq)/2/sorted.length*100;
+};
+const COMPS=RADAR.flatMap(ax=>ax.c);
+/* null = component unavailable, drop it and renormalise; 0 = a real zero */
+function compVal(a,c){
+  if(c.z&&c.z(a)) return 0;
+  const v=c.f(a);
+  return (v==null||Number.isNaN(v)||!Number.isFinite(v))?null:v;
+}
+function axisRaw(a,ax,cols,base){
+  let num=0,den=0;
+  ax.c.forEach((c,ci)=>{
+    const v=compVal(a,c); if(v==null) return;
+    let pc=(c.z&&c.z(a))?0:pctOf(cols[base+ci],v);
+    if(pc==null) return;
+    if(c.inv) pc=100-pc;              /* fewer fouls ranks higher */
+    num+=pc*c.w; den+=c.w;
+  });
+  return den>0?num/den:null;
+}
+function radarPool(p,scope,y){
+  const key=posOf(p)+'|'+(scope==='class'?p.cls:'*')+'|'+y;
+  let R=RPOOL.get(key);
+  if(!R){
+    const seasons=peerSeasons(p,scope,y).filter(s=>s.q.min>RADAR_MIN_MIN);
+    const cols=COMPS.map(()=>[]);
+    seasons.forEach(s=>COMPS.forEach((c,gi)=>{
+      if(c.z&&c.z(s)) return;                   /* real zeros sit out the ranking */
+      const v=compVal(s,c); if(v!=null) cols[gi].push(v);
+    }));
+    cols.forEach(a=>a.sort((x,z)=>x-z));
+    let base=0; const offs=RADAR.map(ax=>{const o=base;base+=ax.c.length;return o;});
+    const axes=RADAR.map((ax,ai)=>{
+      const v=seasons.map(s=>axisRaw(s,ax,cols,offs[ai])).filter(x=>x!=null);
+      v.sort((x,z)=>x-z); return v;});
+    R={n:seasons.length,cols,offs,axes}; RPOOL.set(key,R);
+  }
+  return R;
+}
+function radarValues(p,scope,y){
+  const a=seasonFor(p,y);
+  if(!a||!(a.q.min>RADAR_MIN_MIN)) return {short:true,vals:RADAR.map(()=>null),n:0};
+  const R=radarPool(p,scope,y);
+  if(R.n<2) return {thin:true,vals:RADAR.map(()=>null),n:R.n};
+  const vals=RADAR.map((ax,ai)=>{
+    const raw=axisRaw(a,ax,R.cols,R.offs[ai]);
+    if(raw===0) return 0;          /* every part was a real zero — floor, not midrank */
+    const q=pctOf(R.axes[ai],raw);
+    return q==null?null:Math.round(q);});
+  return {vals,n:R.n};
+}
+
+/* ── chart primitives ─────────────────────────────────────────── */
+function sparkChart(pts,peer,labels,isRate,unit){
+  const W=210,H=112,L=30,R=16,T=12,B=22;
+  const all=[...pts,...peer].filter(v=>v!=null);
+  if(!all.length) return `<div class="nochart">No data</div>`;
+  let lo=Math.min(...all), hi=Math.max(...all);
+  if(hi===lo){hi=lo+(lo||1)*.2;lo=Math.max(0,lo-(lo||1)*.2);}
+  const pad=(hi-lo)*.18; lo=Math.max(0,lo-pad); hi=hi+pad;
+  const x=i=>L+(pts.length<2?(W-L-R)/2:i*(W-L-R)/(pts.length-1));
+  const y=v=>T+(H-T-B)*(1-(v-lo)/(hi-lo));
+  const ax=v=>isRate?(v*100).toFixed(0):v.toFixed(1);
+  const ex=v=>v==null?'—':(isRate?(v*100).toFixed(1):v.toFixed(2));
+
+  const line=(arr,cls)=>{const seg=arr.map((v,i)=>v==null?null:[x(i),y(v)]).filter(Boolean);
+    if(seg.length<2) return '';
+    return `<polyline class="${cls}" points="${seg.map(q=>q.join(',')).join(' ')}"/>`;};
+  const dots=pts.map((v,i)=>v==null?'':`<circle class="pdot" cx="${x(i)}" cy="${y(v)}" r="3.2"/>`).join('');
+  const peerFlat=(pts.length<2)?peer.map((v,i)=>v==null?'':
+    `<line class="peerline" x1="${L}" y1="${y(v)}" x2="${W-R}" y2="${y(v)}"/>`).join(''):'';
+  const peerDots=(pts.length<2)?'':peer.map((v,i)=>v==null?'':
+    `<circle class="xdot" cx="${x(i)}" cy="${y(v)}" r="2"/>`).join('');
+
+  /* x labels: keep them inside the box. A season reads "25-26" and the last one
+     sat centred on the final gridline, so its tail fell outside the viewBox. */
+  const ticks=labels.map((sLab,i)=>{
+    const half=String(sLab).length*2.85, cx=x(i);   /* xtick 字号 10 时每字符约 2.85 */
+    const anchor=cx-half<1?'start':(cx+half>W-1?'end':'middle');
+    const tx=anchor==='start'?1:(anchor==='end'?W-1:cx);
+    return `<text class="xtick" x="${tx}" y="${H-7}" text-anchor="${anchor}">${esc(sLab)}</text>`;}).join('');
+
+  /* hover readout — pure CSS, no script, so it survives a re-render */
+  const tips=pts.map((v,i)=>{
+    if(v==null) return '';
+    const two=peer[i]!=null, tw=76, th=two?27:19;
+    let tx=Math.max(1,Math.min(W-tw-1,x(i)-tw/2));
+    const above=y(v)-th-8>=0, ty=above?y(v)-th-8:Math.min(H-B-th-2,y(v)+8);
+    return `<g class="pt">
+      <circle class="hit" cx="${x(i)}" cy="${y(v)}" r="11"/>
+      <g class="tipbox" transform="translate(${tx},${ty})">
+        <rect width="${tw}" height="${th}" rx="2"/>
+        <text class="tl" x="5" y="8.5">${esc(labels[i])}</text>
+        <text class="tv" x="${tw-5}" y="8.5">${ex(v)}${unit||''}</text>
+        ${two?`<text class="tp" x="5" y="20">peer</text>
+              <text class="tp" x="${tw-5}" y="20">${ex(peer[i])}${unit||''}</text>`:''}
+      </g></g>`;}).join('');
+
+  return `<svg viewBox="0 0 ${W} ${H}" class="spark" role="img">
+    <line class="axis" x1="${L}" y1="${T}" x2="${L}" y2="${H-B}"/>
+    <line class="axis" x1="${L}" y1="${H-B}" x2="${W-R}" y2="${H-B}"/>
+    <text class="atick" x="${L-5}" y="${y(hi)+3}">${ax(hi)}</text>
+    <text class="atick" x="${L-5}" y="${y(lo)+3}">${ax(lo)}</text>
+    ${line(peer,'peerline')}${peerFlat}${peerDots}
+    ${line(pts,'pline')}${dots}
+    ${ticks}${tips}
+  </svg>`;
+}
+
+function radarChart(vals){
+  const S=250,cx=S/2,cy=S/2+4,R=78;
+  const n=RADAR.length, ang=i=>-Math.PI/2+i*2*Math.PI/n;
+  const at=(i,r)=>[cx+Math.cos(ang(i))*r, cy+Math.sin(ang(i))*r];
+  const rings=[25,50,75,100].map(t=>{
+    const p=RADAR.map((_,i)=>at(i,R*t/100).join(',')).join(' ');
+    return `<polygon class="rring" points="${p}"/>`;}).join('');
+  const spokes=RADAR.map((_,i)=>{const [X,Y]=at(i,R);
+    return `<line class="rspoke" x1="${cx}" y1="${cy}" x2="${X}" y2="${Y}"/>`;}).join('');
+  const have=vals.filter(v=>v!=null).length;
+  const blank=have===0?' blank':'';
+  const poly=have===n?`<polygon class="rfill" points="${
+    vals.map((v,i)=>at(i,R*Math.max(v,3)/100).join(',')).join(' ')}"/>`:'';
+  const knobs=vals.map((v,i)=>v==null?'':
+    `<circle class="rdot" cx="${at(i,R*Math.max(v,3)/100)[0]}" cy="${at(i,R*Math.max(v,3)/100)[1]}" r="3"/>`).join('');
+  const labs=RADAR.map((d,i)=>{const [X,Y]=at(i,R+22);
+    return `<text class="rlab" x="${X}" y="${Y}" text-anchor="middle">${d.l}</text>
+            <text class="rval" x="${X}" y="${Y+13}" text-anchor="middle">${vals[i]==null?'—':vals[i]}</text>`;}).join('');
+  return `<svg viewBox="0 0 ${S} ${S+16}" class="radar${blank}" role="img">
+    ${rings}${spokes}${poly}${knobs}${labs}</svg>`;
+}
+
+/* ── detail page state ───────────────────────────────────────── */
+const DT={open:null, trend:'class', radar:'class', radarY:null};
+
+const IG_ICON=`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7">
+  <rect x="3.5" y="3.5" width="17" height="17" rx="4.5"/><circle cx="12" cy="12" r="4"/>
+  <circle cx="17.2" cy="6.8" r="1.1" fill="currentColor" stroke="none"/></svg>`;
+
+const RKSVC=[['ESPN','espn'],['247','c247'],['On3','on3']];
+
+/* NR is a claim — it says the list was read and he is not on it. A service that
+   failed to load must not be allowed to make that claim, so a missing key draws
+   an em dash instead. Same reason an ambiguous name gets no rank at all. */
+function rankBlock(p){
+  const r=RANKS[p.id];
+  const wrap=b=>`<div class="rkgroup"${RANKMETA.asOf?` title="Rankings as of ${esc(RANKMETA.asOf)}"`:''}>${b}</div>`;
+  const note=t=>wrap(`<span class="rk-none">${t}</span>`);
+  if(!r) return note('Unranked in all three services');
+  if(r.amb) return note('More than one prospect in this class carries this name — no rank attached');
+  const has=k=>Object.prototype.hasOwnProperty.call(r,k);
+  if(!RKSVC.some(([,k])=>has(k))) return note('Rankings could not be read for this build');
+  if(RKSVC.every(([,k])=>has(k)&&r[k]==null)) return note('Unranked in all three services');
+  return wrap(RKSVC.map(([lab,k])=>{
+    const v=!has(k)
+      ? '<span class="out" title="This service could not be read when the snapshot was built — not the same as unranked">—</span>'
+      : (r[k]==null?'<span class="nr">NR</span>':'#'+esc(r[k]));
+    return `<div class="rk"><dt>${lab}</dt><dd>${v}</dd></div>`;
+  }).join(''));
+}
+
+/* Feed it the JSON from hs_hoops_rankings.py --snapshot. Values are re-checked
+   here rather than trusted: only finite positive numbers and explicit nulls ever
+   reach the DOM, so a malformed snapshot cannot smuggle markup through. Left off
+   the UI on purpose — call it from the console, or point a fetch() at the
+   snapshot once it has a home. */
+function applyRankSnapshot(snap){
+  if(!snap||typeof snap!=='object'||!snap.ranks||typeof snap.ranks!=='object')
+    throw new Error('That is not a rank snapshot.');
+  const keys=RKSVC.map(s=>s[1]), out=Object.create(null);
+  Object.keys(snap.ranks).forEach(id=>{
+    const v=snap.ranks[id];
+    if(!v||typeof v!=='object') return;
+    if(v.amb){ out[id]={amb:true}; return; }
+    const e={};
+    keys.forEach(k=>{
+      if(!Object.prototype.hasOwnProperty.call(v,k)) return;   /* absent stays absent */
+      const n=v[k];
+      if(n===null) e[k]=null;
+      else if(typeof n==='number'&&Number.isFinite(n)&&n>0) e[k]=Math.round(n);
+    });
+    out[id]=e;
+  });
+  RANKS=out;
+  RANKMETA={asOf:typeof snap.asOf==='string'?snap.asOf.slice(0,10):null,
+            services:(snap.services&&typeof snap.services==='object')?snap.services:{}};
+  try{ render(); }
+  catch(e){ console.warn('Snapshot applied, but the view could not repaint yet.',e); }
+  return {players:Object.keys(out).length,
+          ambiguous:Object.keys(out).filter(k=>out[k].amb).length};
+}
+window.applyRankSnapshot=applyRankSnapshot;
+
+function viewPlayer(p){
+  const ss=seasons(p), latest=ss[0]||null;
+  const yrs=ss.slice(0,3).map(a=>a.y).sort((a,b)=>a-b);
+  const aff=affiliation(p);
+
+  $('#title').textContent=p.n;
+  $('#scope').hidden=false; $('#scope').textContent='All events';
+  $('#note').textContent=`${p.rec} event record${p.rec===1?'':'s'} · ${ss.length} season${ss.length===1?'':'s'}`;
+
+  const igQ=encodeURIComponent(`"${p.n}" ${p.cls||''} basketball instagram`);
+
+  const head=`<section class="pd-head">
+    <dl class="pd-bio">
+      <div><dt>Class</dt><dd>${p.cls?esc(p.cls):'<span class="blank">—</span>'}</dd></div>
+      <div><dt>Height</dt><dd>${p.ht?esc(p.ht):'<span class="blank">—</span>'}</dd></div>
+      <div><dt>Position</dt><dd>
+        <select class="posedit big${p.posManual?' manual':(p.pos?'':' none')}" data-pos-for="${p.id}"
+          aria-label="Position for ${esc(p.n)}">
+          <option value=""${p.pos?'':' selected'}>Not listed</option>
+          ${POSOPTS.map(o=>`<option value="${o}"${p.pos===o?' selected':''}>${o} · ${BUCKET[o]}</option>`).join('')}
+        </select>
+        ${/* no note when the value simply came from the data — annotate the
+             exceptions only, so the default state stays quiet */''}
+        ${p.posManual?'<span class="pd-sub">Set by hand — peer group follows this</span>'
+          :(p.pos?'':'<span class="pd-sub">Not in any record — set it to get a peer group</span>')}
+      </dd></div>
+      <div><dt>School</dt><dd>${p.hs?esc(p.hs):'<span class="blank">—</span>'}</dd></div>
+      <div><dt>Team</dt><dd>${aff.club?esc(aff.club.tm):'<span class="blank">—</span>'}
+        ${aff.club?`<span class="pd-sub">${esc(aff.club.e.n)}</span>`:''}</dd></div>
+    </dl>
+    <div class="pd-side">
+      ${rankBlock(p)}
+      <a class="ig" href="https://www.google.com/search?q=${igQ}" target="_blank" rel="noopener"
+         title="Search Google for this player's Instagram">${IG_ICON}</a>
+    </div>
+    ${p.st==='review'?`<div class="pd-warn"><span>!</span>
+      Identity unresolved — records from more than one player may be merged here.
+      Treat every number on this page as provisional.
+      ${p.why?`<em>${esc(p.why)}</em>`:''}</div>`:''}
+  </section>`;
+
+  let body='';
+  ss.forEach(a=>{
+    const open=DT.open===a.y;
+    body+=`<tr class="srow${open?' open':''}" data-season="${a.y}" tabindex="0">
+      <td class="stog">${open?'▾':'▸'}</td>
+      <td class="syr">${seasonLabel(a.y)}<span class="pd-sub">season ${a.y}</span></td>
+      <td class="num">${a.ev.length}</td><td class="num">${a.g}</td>
+      <td class="num">${Math.round(a.min)}</td>${colCells(a)}</tr>`;
+    if(open) a.ev.forEach(({e,s})=>{
+      body+=`<tr class="erow-sub"><td></td>
+        <td class="esubname">${esc(e.n)}<span class="pd-sub">${esc(e.dl)}, ${e.d.slice(0,4)} · ${esc(e.c)}</span></td>
+        <td class="num">—</td><td class="num">${s.g}</td>
+        <td class="num">${Math.round(s.min)}</td>${colCells(s)}</tr>`;
+    });
+  });
+
+  const table=`<section class="pd-block">
+    <div class="pd-bar"><h3>Season averages</h3>${perToggle()}</div>
+    <table class="pd-table"><thead><tr>
+      <th></th><th>Season</th><th class="num">Ev</th><th class="num">GP</th><th class="num">MIN</th>
+      ${colHead()}
+    </tr></thead><tbody>${body||`<tr><td colspan="${5+COLS.length}">No event records</td></tr>`}</tbody></table>
+    <p class="pd-foot">Season runs Sept 1 – Aug 31, named for the ending year. Averages are season
+      totals divided by season games, not an average of per-event averages.</p>
+  </section>`;
+
+  const labels=yrs.map(seasonLabel);
+  const grid=TREND.map(c=>{
+    const mine=yrs.map(y=>val(seasonFor(p,y),c,per));
+    const peer=yrs.map(y=>peerMean(p,DT.trend,y,c,per));
+    return `<figure class="sparkbox"><figcaption>${esc(colLabel(c,per))}</figcaption>
+      ${sparkChart(mine,peer,labels,!!(c.a||c.f),'%')}</figure>`;}).join('');
+
+  const peerLabel=DT.trend==='class'?`${p.cls||'unlisted'} ${posOf(p)}s`:`all ${posOf(p)}s`;
+  const nPeer=latest?peerCount(p,DT.trend,latest.y):0;
+  const trend=`<section class="pd-block">
+    <div class="pd-bar"><h3>Trend</h3>
+      <div class="pd-legend"><span class="k-p"></span>${esc(p.n.split(' ')[0])}
+        <span class="k-x"></span>${esc(peerLabel)} combined${nPeer?` · ${nPeer.toLocaleString()}`:''}</div>
+      <div class="seg2" data-group="trend">
+        <button data-trend="class" aria-pressed="${DT.trend==='class'}">Same class</button>
+        <button data-trend="pos" aria-pressed="${DT.trend==='pos'}">All ${esc(posOf(p))}s</button></div></div>
+    <div class="sparkgrid">${grid}</div>
+
+    ${yrs.length<3?`<p class="pd-foot">${yrs.length} season${yrs.length===1?'':'s'} on record —
+      ${yrs.length===1?'a single point, no trend yet.':'two points, so the line is a segment.'}</p>`:''}
+  </section>`;
+
+  /* The coach picks the season. Default is the most recent, but a thin latest
+     season is worth stepping back from rather than reading anyway. */
+  const yrsAll=ss.map(a=>a.y);
+  const rY = (DT.radarY!=null && yrsAll.includes(DT.radarY)) ? DT.radarY : (latest?latest.y:null);
+  const rSeason = rY!=null ? seasonFor(p,rY) : null;
+  const R = rY!=null ? radarValues(p,DT.radar,rY) : {short:true,vals:RADAR.map(()=>null),n:0};
+  const scopeLab=DT.radar==='class'?`${p.cls||'unlisted'} ${posOf(p)}s`:`all ${posOf(p)}s`;
+
+  const yearSel = ss.length>1
+    ? `<label class="ryear">Season <select id="radaryear">${ss.map(a=>
+        `<option value="${a.y}"${a.y===rY?' selected':''}>${seasonLabel(a.y)}${
+          a.q.min>RADAR_MIN_MIN?'':' · thin'}</option>`).join('')}</select></label>` : '';
+
+  /* Each axis, its parts, what this player actually did in the chosen season,
+     and how much each part counts. The number is the reading; the weight sits
+     behind it in brackets. "none" means he never attempted it, which is a real
+     zero rather than a gap in the data. */
+  const fmtComp=(c,a)=>{
+    if(!a) return '—';
+    if(c.z&&c.z(a)) return '<span class="rvnone">none</span>';
+    const v=c.f(a);
+    if(v==null||!Number.isFinite(v)) return '—';
+    return c.t==='p' ? rate(v) : (c.t==='x' ? v.toFixed(2) : v.toFixed(1));
+  };
+  const weightTable=`<dl class="rwt">${RADAR.map(ax=>
+    `<div class="rwt-ax"><dt>${esc(ax.l)}</dt><dd>${ax.c.map(c=>
+      `<span class="rwt-row"><i>${esc(c.l)}</i><b>${fmtComp(c,rSeason)}</b><u>${
+        c.w.toFixed(2).slice(1)}</u></span>`).join('')}</dd></div>`).join('')}</dl>
+  <p class="rwt-foot">Fouls are ranked in reverse — fewer is better.</p>`;
+
+  const rBody = R.short
+    ? `<div class="radarwrap">${radarChart(R.vals)}
+        <div class="radarnote">
+          <p class="thinwarn"><b>Sample too small to rank.</b></p>
+          <p>${rSeason
+            ? `Only <b>${Math.round(rSeason.q.min)}</b> minutes of recorded floor time in
+               ${seasonLabel(rY)}; ranking needs more than ${RADAR_MIN_MIN}.`
+            : 'No recorded floor time in this season.'}
+             ${ss.length>1?'Try an earlier season.':''}</p>
+        </div></div>`
+    : R.thin
+    ? `<div class="radarwrap">${radarChart(R.vals)}
+        <div class="radarnote">
+          <p class="thinwarn"><b>Peer pool too small to rank against.</b></p>
+          <p>Only ${R.n} qualifying player${R.n===1?'':'s'} in <b>${esc(scopeLab)}</b> for
+            ${seasonLabel(rY)}. Switch to the wider scope.</p>
+        </div></div>`
+    : `<div class="radarwrap">${radarChart(R.vals)}
+        <div class="radarnote">
+          <p>Percentile within <b>${esc(scopeLab)}</b>, ${seasonLabel(rY)} season,
+             against <b>${R.n.toLocaleString()}</b> player${R.n===1?'':'s'}.</p>
+          ${weightTable}
+        </div></div>`;
+  const radar=`<section class="pd-block">
+    <div class="pd-bar"><h3>Percentile profile</h3>
+      ${yearSel}
+      <div class="seg2" data-group="radar">
+        <button data-radar="class" aria-pressed="${DT.radar==='class'}">Same class</button>
+        <button data-radar="pos" aria-pressed="${DT.radar==='pos'}">All ${esc(posOf(p))}s</button></div></div>
+    ${rBody}
+  </section>`;
+
+  $('#out').innerHTML=head+table+trend+radar;
+}
+
+function empty(h,p){$('#out').innerHTML=`<div class="empty"><h3>${h}</h3><p>${p}</p></div>`;}
+
+/* ── events ────────────────────────────── */
+$('#nav').onclick=e=>{const b=e.target.closest('.nav-item');if(!b)return;
+  view=b.dataset.view;
+  if(view==='saved') mode='players';
+  F.cls.clear();F.pos.clear();F.circ.clear();RF.pos.clear();
+  stack=[{t:'board'}];setQ('');
+  [...document.querySelectorAll('.nav-item')].forEach(n=>n.setAttribute('aria-current',n===b));
+  render();};
+
+$('#seg').onclick=e=>{const b=e.target.closest('button');if(!b)return;
+  mode=b.dataset.mode;setQ('');render();};
+
+$('#back').onclick=back;
+
+$('#crumb').onclick=e=>{const b=e.target.closest('button');if(!b)return;
+  const j=b.dataset.jump;
+  if(j==='board')toBoard(); else if(j==='events')toBoard('events');
+  else if(j==='players')toBoard('players'); else if(j==='back')back();};
+
+$('#filters').addEventListener('click',e=>{
+  const pv=e.target.closest('[data-per]');
+  if(pv){per=pv.dataset.per;render();return;}
+  const c=e.target.closest('.chip');if(!c)return;
+  const w=c.parentElement.dataset.set, v=c.dataset.v;
+  if(w==='un'){hideUnnamed=!hideUnnamed;render();return;}
+  const set=w==='cls'?F.cls:w==='pos'?F.pos:w==='rpos'?RF.pos:F.circ;
+  set.has(v)?set.delete(v):set.add(v);render();});
+
+$('#out').addEventListener('click',e=>{
+  const pg=e.target.closest('[data-pg]');
+  if(pg){const v=pg.dataset.pg;
+    page = v==='prev'?Math.max(1,page-1) : v==='next'?Math.min(lastPages,page+1) : +v;
+    render(); const o=$('#out'); if(o.scrollIntoView)o.scrollIntoView({block:'start'}); return;}
+  const pv=e.target.closest('[data-per]');
+  if(pv){per=pv.dataset.per;render();return;}
+  const c=e.target.closest('[data-trend],[data-radar],.srow');
+  if(c&&here().t==='player'){
+    if(c.dataset.trend!==undefined) DT.trend=c.dataset.trend;
+    else if(c.dataset.radar!==undefined) DT.radar=c.dataset.radar;
+    else if(c.classList.contains('srow')){
+      const y=+c.dataset.season; DT.open = DT.open===y?null:y;}
+    render(); return;}
+  const s=e.target.closest('.star');
+  if(s){e.stopPropagation();const n=+s.dataset.id;
+    savedP.has(n)?savedP.delete(n):savedP.add(n);
+    render();return;}
+  const pl=e.target.closest('.plink');
+  if(pl){go({t:'player',id:+pl.dataset.player});return;}
+  const row=e.target.closest('.erow');
+  if(row)openEvent(row.dataset.event);
+});
+
+$('#out').addEventListener('keydown',e=>{
+  if(e.key!=='Enter'&&e.key!==' ')return;
+  if(e.target.classList&&e.target.classList.contains('srow')){
+    e.preventDefault(); const y=+e.target.dataset.season;
+    DT.open = DT.open===y?null:y; render(); return;}
+  if(!e.target.classList||!e.target.classList.contains('erow'))return;
+  e.preventDefault();
+  openEvent(e.target.dataset.event);
+});
+
+$('#out').addEventListener('change',e=>{
+  const ry=e.target.closest('#radaryear');
+  if(ry){DT.radarY=+ry.value;render();return;}
+  const ps=e.target.closest('#pgsize');
+  if(ps){pageSize=+ps.value;page=1;render();return;}
+  const pe=e.target.closest('[data-pos-for]');
+  if(pe){setPos(P(+pe.dataset.posFor),pe.value);return;}
+});
+function openEvent(id){RF.pos.clear();go({t:'event',id});}
+
+/* search is debounced — at 86k rows a keystroke-per-render is jittery */
+let qT=null;
+$('#q').oninput=e=>{const v=e.target.value.trim().toLowerCase();
+  clearTimeout(qT); qT=setTimeout(()=>{q=v;render();}, PLAYERS.length>5000?160:0);};
+
+/* ═══════════════════════════════════════════════════════════════
+   IMPORT UI
+   ═══════════════════════════════════════════════════════════════ */
+const dropEl=$('#drop'), dzEl=$('#dz'), fileEl=$('#file'),
+      progEl=$('#prog'), barEl=$('#bar'), msgEl=$('#pmsg'), errEl=$('#droperr');
+let busy=false;
+
+const openDrop =()=>{dropEl.classList.add('on');errEl.classList.remove('on');};
+const closeDrop=()=>{if(!busy)dropEl.classList.remove('on');};
+
+$('#dropcancel').onclick=closeDrop;   /* #srcbtn is wired inside paintSource */
+dzEl.onclick=()=>fileEl.click();
+dzEl.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();fileEl.click();}};
+fileEl.onchange=e=>{const f=e.target.files[0]; if(f)run(f); e.target.value='';};
+['dragenter','dragover'].forEach(t=>dzEl.addEventListener(t,e=>{e.preventDefault();dzEl.classList.add('hot');}));
+['dragleave','drop'].forEach(t=>dzEl.addEventListener(t,e=>{e.preventDefault();dzEl.classList.remove('hot');}));
+dzEl.addEventListener('drop',e=>{const f=e.dataTransfer.files[0]; if(f)run(f);});
+document.addEventListener('dragover',e=>e.preventDefault());
+document.addEventListener('drop',e=>e.preventDefault());
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeDrop();});
+
+let lastPaint=0;
+async function say(text,pct){
+  barEl.style.width=Math.round(pct*100)+'%';
+  msgEl.innerHTML=esc(text)+' <b>'+Math.round(pct*100)+'%</b>';
+  const now=performance.now();
+  if(now-lastPaint>60){lastPaint=now; await new Promise(r=>setTimeout(r,0));}
+}
+
+async function run(file){
+  if(busy) return;
+  busy=true; errEl.classList.remove('on'); progEl.classList.add('on');
+  $('#dropcancel').disabled=true; dzEl.style.pointerEvents='none';
+  try{
+    await say('Reading '+file.name, 0);
+    const out=await importCSV(file,say);
+    await say('Indexing', .95);
+    PLAYERS=out.players; EVENTS=out.events;
+    RANKS={}; RANKMETA={asOf:null,services:{}};
+    savedP=new Set(); F.cls.clear(); F.pos.clear(); F.circ.clear(); RF.pos.clear();
+    hideUnnamed=true;
+    view='usa'; mode='players'; stack=[{t:'board'}]; setQ('');
+    sortBoard='pts'; sortRoster='pts'; per='g';
+    [...document.querySelectorAll('.nav-item')].forEach(n=>
+      n.setAttribute('aria-current',n.dataset.view==='usa'));
+    reindex();
+    await say('Done', 1);
+    paintSource();
+    render();
+    dropEl.classList.remove('on');
+  }catch(err){
+    console.error(err);
+    errEl.textContent=err&&err.message?err.message:'Could not read that file.';
+    errEl.classList.add('on');
+  }finally{
+    busy=false; progEl.classList.remove('on');
+    $('#dropcancel').disabled=false; dzEl.style.pointerEvents='';
+  }
+}
+
+function paintSource(){
+  const el=$('#src');
+  const fixed=PLAYERS.filter(p=>p.posManual).length;
+  const fixLine=fixed?`<div class="fixline"><b>${fixed.toLocaleString()}</b> position${fixed===1?'':'s'} set by hand
+      · <a href="#" id="fixexp">export</a> · <a href="#" id="fiximp">import</a></div>`:'';
+  if(!IMPORT.active){
+    el.innerHTML=`<b>Prototype data</b><br>22 players · 32 events
+      <div><span class="tagline demo">Sample</span></div>${fixLine}
+      <button id="srcbtn">Load real data…</button>`;
+  }else{
+    el.innerHTML=`<b>${esc(IMPORT.file)}</b><br>
+      ${IMPORT.players.toLocaleString()} players · ${IMPORT.rows.toLocaleString()} event records<br>
+      ${IMPORT.events.toLocaleString()} events · ${(IMPORT.ms/1000).toFixed(1)}s
+      ${IMPORT.exactDup?`<br>${IMPORT.exactDup.toLocaleString()} exact repeats dropped`:''}
+      ${IMPORT.merged?`<br>${IMPORT.merged.toLocaleString()} same-event rows merged`:''}
+      ${IMPORT.dropped?`<br>${IMPORT.dropped.toLocaleString()} rows skipped`:''}
+      <div><span class="tagline live">Live</span></div>${fixLine}
+      <button id="srcbtn">Load another file…</button>`;
+  }
+  $('#srcbtn').onclick=openDrop;
+  const ex=$('#fixexp'), im=$('#fiximp');
+  if(ex) ex.onclick=e=>{e.preventDefault();
+    const blob=new Blob([JSON.stringify(Object.fromEntries(POSFIX),null,1)],{type:'application/json'});
+    const a=document.createElement('a');
+    a.href=URL.createObjectURL(blob); a.download='fau_position_overrides.json';
+    a.click(); setTimeout(()=>URL.revokeObjectURL(a.href),1000);};
+  if(im) im.onclick=e=>{e.preventDefault(); posImportEl.click();};
+}
+const posImportEl=Object.assign(document.createElement('input'),{type:'file',accept:'.json'});
+posImportEl.onchange=async e=>{
+  const f=e.target.files[0]; e.target.value='';
+  if(!f) return;
+  try{
+    const obj=JSON.parse(await f.text());
+    Object.entries(obj).forEach(([k,v])=>{const n=narrowPos(v); if(n)POSFIX.set(k,n);});
+    PLAYERS.forEach(applyPosFix); pfixSave(); rebuildBuckets(); paintSource(); render();
+  }catch(err){ console.error(err); }
+};
+
+/* console handle — poke at the imported database from devtools:
+   FAU.meta, FAU.players, FAU.find('devin booker'), FAU.events   */
+window.FAU={get players(){return PLAYERS;}, get events(){return EVENTS;},
+  get boards(){return BOARD;}, get meta(){return IMPORT;},
+  find:s=>PLAYERS.filter(p=>p.q.includes(String(s).toLowerCase())).slice(0,25),
+  get posfix(){return POSFIX;}, get buckets(){return BUCKETS;},
+  seasons, setPos, load:run, render,
+  stat:(a,k,pr)=>val(a,COL(k),pr||per), cols:COLS, trend:TREND,
+  peerPool, peerMean, peerCount, spark:sparkChart,
+  radar:RADAR, radarValues, radarPool, radarMin:RADAR_MIN_MIN, per40Floor:MIN40_FLOOR, peerSeasons};
+
+pfixLoad();
+reindex();
+paintSource();
+render();
+
+/* ── bundled dataset ──────────────────────────────────────────
+   If the site ships its own data, load it on open so a visitor never has to
+   drag anything. Nothing bundled — or opened straight off the disk with
+   file:// — and this quietly does nothing, leaving the drop zone exactly as
+   it was. The file goes through run(), the same function the drop zone uses,
+   so a bundled board and a dragged one cannot diverge.
+
+     data/board.csv.gz   player data, gzipped   (data/board.csv also works)
+     data/ranks.json     optional, from hs_hoops_rankings.py --snapshot   */
+async function bootBundled(){
+  const grab=async u=>{ try{ const r=await fetch(u,{cache:'no-cache'}); return r.ok?r:null; }
+                        catch(e){ return null; } };
+
+  let r=await grab('./data/board.csv.gz'), gz=!!r;
+  if(!r){ r=await grab('./data/board.csv'); }
+  if(!r) return;                       /* no bundle — the drop zone stands */
+
+  openDrop();
+  progEl.classList.add('on');
+  dzEl.style.pointerEvents='none';
+  msgEl.textContent='Downloading dataset';
+
+  try{
+    /* stream it so a big file shows progress instead of a dead page */
+    const total=+(r.headers.get('content-length')||0);
+    let blob;
+    if(r.body&&total){
+      const rd=r.body.getReader(), parts=[]; let got=0;
+      for(;;){
+        const {done,value}=await rd.read();
+        if(done) break;
+        parts.push(value); got+=value.length;
+        msgEl.textContent='Downloading dataset  '
+          +(got/1048576).toFixed(1)+' / '+(total/1048576).toFixed(0)+' MB';
+      }
+      blob=new Blob(parts);
+    } else blob=await r.blob();
+
+    if(gz){
+      try{ blob=await new Response(blob.stream().pipeThrough(new DecompressionStream('gzip'))).blob(); }
+      catch(e){ /* the host already un-gzipped it for us — use the bytes as they are */ }
+    }
+    await run(new File([blob],'board.csv'));
+
+    /* ranks go on after run(), because run() clears them by design:
+       a new dataset invalidates the old id-to-rank mapping. */
+    const rr=await grab('./data/ranks.json');
+    if(rr){ try{ applyRankSnapshot(await rr.json()); }
+            catch(e){ console.warn('ranks.json could not be read:',e); } }
+  }catch(err){
+    console.error(err);
+    errEl.textContent='Could not load the bundled dataset. '+(err.message||'');
+    errEl.classList.add('on');
+  }finally{
+    progEl.classList.remove('on');
+    dzEl.style.pointerEvents='';
+  }
+}
+bootBundled();
+</script>
